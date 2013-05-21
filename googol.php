@@ -40,7 +40,7 @@
 	function render_query($array){
 		if (!is_array($array)||count($array)==0){return false;}
 		foreach ($array['links'] as $nb => $link){
-			$r=str_replace('#link',$link,TPL);
+			$r=str_replace('#link',urldecode($link),TPL);
 			$r=str_replace('#title',$array['titles'][$nb],$r);
 			$d=str_replace('<br>','',$array['descriptions'][$nb]);
 			$d=str_replace('<br/>','',$d);
@@ -64,7 +64,7 @@
 	<style>
 		*{-webkit-box-sizing: border-box;-moz-box-sizing: border-box;box-sizing: border-box;}
 		body{padding:0;margin:0;}
-		aside{padding:25px;padding-top:0;}
+		aside{padding:0 25px 50px;}
 		a {text-decoration: none; }
 		hr{border:none;border-top:1px solid #aaa;}
 		form{margin-bottom:20px;}
