@@ -128,7 +128,7 @@
 		echo '<hr/><p class="footerlogo">'.LOGO1.str_repeat('<em class="o2">o</em>', $array['nb_pages']-1).LOGO2.'</p><div class="pagination">';
 		for ($i=0;$i<$array['nb_pages']-1;$i++){
 			if ($i*10==$array['current_page']){echo '<em>'.($i+1).'</em>';}
-			else{echo '<a href="?q='.htmlentities($array['query']).$img.'&start='.$i.'0">'.($i+1).'</a>';}
+			else{echo '<a href="?q='.$array['query'].$img.'&start='.$i.'0">'.($i+1).'</a>';}
 		}
 		echo  '</div>';
 	}
@@ -182,6 +182,7 @@
 		.footerlogo em{font-style: normal;display:inline-block;}
 		footer{position:fixed;bottom:0;left:0;right:0;height:auto;min-height:40px;border-top:solid 1px #ddd;margin-top:30px;background-color:#EEE;text-align: right;color:#555;line-height: 30px;padding-right:10px;padding-bottom:5px;}
 		footer a{color:#444;font-weight: bold;}
+		footer img{vertical-align: middle}
 	</style>
 	<link rel="shortcut icon" href="favicon.png" /> 
 	<link rel="search" type="application/opensearchdescription+xml" title="Googol G sans mensonge" href="'<?php echo RACINE;?>googol.xml">
@@ -194,7 +195,9 @@
 	<?php echo LOGO1.LOGO2; ?>
 	<p class="mini">DTC</p>
 	<form action="" method="get" >
-	<input type="text" name="q" placeholder="Rechercher" value="<?php echo htmlentities($q); ?>"/><input type="submit" value="OK"/>
+	<input type="text" name="q" placeholder="Rechercher" value="<?php echo htmlentities($q); ?>"/>
+	<?php if ($img){echo '<input type="hidden" name="img"/>';}?>
+	<input type="submit" value="OK"/>
 	</form>
 </header>
 <nav>
@@ -208,7 +211,7 @@
 </aside>
 <footer>Googol est une niaiserie de <a href="http://warriordudimanche.net">Bronco - warriordudimanche.net</a>  (voir sur <a 
 
-href="https://github.com/broncowdd/googol">GitHub</a>)</footer>
+href="https://github.com/broncowdd/googol">GitHub</a>) <a href="http://flattr.com/thing/1319925/broncowddSnippetVamp-on-GitHub" target="_blank"><img src="http://images.warriordudimanche.net/flattr.png" alt="Flattr this" title="Flattr this" border="0" /></a></footer>
 </body>
 
 </html>
