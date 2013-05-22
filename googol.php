@@ -217,6 +217,8 @@
 <footer>Googol est une niaiserie de <a href="http://warriordudimanche.net">Bronco - warriordudimanche.net</a>  (voir sur <a 
 
 href="https://github.com/broncowdd/googol">GitHub</a>) <a href="http://flattr.com/thing/1319925/broncowddSnippetVamp-on-GitHub" target="_blank"><img src="http://images.warriordudimanche.net/flattr.png" alt="Flattr this" title="Flattr this" border="0" /></a></footer>
+<script type="text/javascript" src="http://api.mywot.com/widgets/ratings.js"></script> 
+
 </body>
 
 </html>
