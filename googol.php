@@ -63,8 +63,6 @@
 		}
 	}
 	function parse_query($query,$start=0,$img=false){
-
-		
 		if (!$img){ // web
 			$page=file_curl_contents(URL.str_replace(' ','+',$query).'&start='.$start);
 			if (!$page){return false;}
@@ -122,10 +120,15 @@
 				$r=str_replace('#thumbs',$array['thumbs'][$nb].'/>',$r);
 				echo $r;
 			}	
-			$img='&img';		
 		}
-		
-		echo '<hr/><p class="footerlogo">'.LOGO1.str_repeat('<em class="o2">o</em>', $array['nb_pages']-1).LOGO2.'</p><div class="pagination">';
+
+		if($array['nb_pages'] != 0){
+			echo '<hr/><p class="footerlogo">'.LOGO1.str_repeat('<em class="o2">o</em>', $array['nb_pages']-1).LOGO2.'</p><div class="pagination">';
+		}
+		else{
+			echo "<div class=\"noresult\"> Pas de resultats </div>";
+		}
+
 		for ($i=0;$i<$array['nb_pages']-1;$i++){
 			if ($i*10==$array['current_page']){echo '<em>'.($i+1).'</em>';}
 			else{echo '<a href="?q='.$array['query'].$img.'&start='.$i.'0">'.($i+1).'</a>';}
@@ -137,7 +140,8 @@
 	if (isset($_GET['start'])){$start=$_GET['start'];}else{$start='';}
 	if (isset($_GET['q'])){$q=$_GET['q'];$title='Googol recherche '.htmlentities($q);}else{$q='';$title='Googol - google sans mensonge';}
 ?>
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+
+<!DOCTYPE html>
 <html dir="ltr" lang="fr">
 <head>
 	<title><?php echo $title; ?> </title>
@@ -183,9 +187,10 @@
 		footer{position:fixed;bottom:0;left:0;right:0;height:auto;min-height:40px;border-top:solid 1px #ddd;margin-top:30px;background-color:#EEE;text-align: right;color:#555;line-height: 30px;padding-right:10px;padding-bottom:5px;}
 		footer a{color:#444;font-weight: bold;}
 		footer img{vertical-align: middle}
+		.noresult{text-align:center;margin-top:5px;}
 	</style>
 	<link rel="shortcut icon" href="favicon.png" /> 
-	<link rel="search" type="application/opensearchdescription+xml" title="Googol G sans mensonge" href="'<?php echo RACINE;?>googol.xml">
+	<link rel="search" type="application/opensearchdescription+xml" title="Googol G sans mensonge" href="<?php echo RACINE;?>googol.xml">
 	<!--[if IE]><script> document.createElement("article");document.createElement("aside");document.createElement
 
 ("section");document.createElement("footer");</script> <![endif]-->
