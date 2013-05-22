@@ -10,7 +10,7 @@
 	define('URL','https://www.google.fr/search?q=');
 	define('URLIMG','&tbm=isch&biw=1920&bih=1075&sei=v5ecUb6OG-2l0wW554GYBQ');
 
-	define('RACINE','http://'.$_SERVER['SERVER_NAME'].$_SERVER['PHP_SELF'].'');
+	define('RACINE','http://'.$_SERVER['SERVER_NAME']);
 	function aff($a,$stop=true){echo 'Arret a la ligne '.__LINE__.' du fichier '.__FILE__.'<pre>';var_dump($a);echo '</pre>';if ($stop){exit();}}
 
 	// imgrefurl => site sources
@@ -199,8 +199,8 @@
 </header>
 <nav>
 <?php 
-	if (!$img){echo '<li class="active">Web</li><li><a href="'.RACINE.'?q='.$q.'&img">Images</a></li>';}
-	else{echo '<li><a href="'.RACINE.'?q='.$q.'">Web</a></li><li class="active">Images</li>';}
+	if (!$img){echo '<li class="active">Web</li><li><a href="?q='.$q.'&img">Images</a></li>';}
+	else{echo '<li><a href="?q='.$q.'">Web</a></li><li class="active">Images</li>';}
 ?>
 </nav>
 <aside>
