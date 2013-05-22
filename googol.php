@@ -2,14 +2,17 @@
 	define('REGEX_WEB','#(?<=<h3 class="r"><a href="/url\?q=)([^&]+).*?>(.*?)</a>.*?(?<=<span class="st">)(.*?)(?=</span>)#');
 	define('REGEX_PAGES','#&start=([0-9]+)|&amp;start=([0-9]+)#');
 	define('REGEX_IMG','#(?<=imgurl=)(.*?)&amp;.*?h=([0-9]+)&amp;w=([0-9]+)&amp;sz=([0-9]+)|(?<=imgurl=)(.*?)&.*?h=([0-9]+)&w=([0-9]+)&sz=([0-9]+)#');
-	define('REGEX_THMBS','#(?<=imgurl=)(.*?)&amp;.*?h=([0-9]+)&amp;w=([0-9]+)&amp;sz=([0-9]+)|(?<=imgurl=)(.*?)&.*?h=([0-9]+)&w=([0-9]+)&sz=([0-9]+)#');
+	define('REGEX_THMBS','#<img.*?height="([0-9]+)".*?width="([0-9]+)".*?src="(.*?)"#');
 	define('TPL','<div class="result"><a href="#link"><h3 class="title">#title</h3>#link</a><p class="description">#description</p></div>');
-	define('TPLIMG','<div class="image" ><a href="#link">#link</a><img src="#link" width="#W" height="#H"/><p class="description">#W x #H (#SZ)</p></div>');
+	define('TPLIMG','<div class="image" ><p><a href="#link" title="#link">#thumbs</a></p><p class="description">#W x #H (#SZ ko)</p></div>');
 	define('LOGO1','<em class="g">G</em><em class="o1">o</em>');
 	define('LOGO2','<em class="o2">o</em><em class="g">g</em><em class="o1">o</em><em class="l">l</em>');
 	define('URL','https://www.google.fr/search?q=');
-	define('HERE','http://'.$_SERVER['SERVER_NAME'].'/');
-	
+	define('URLIMG','&tbm=isch&biw=1920&bih=1075&sei=v5ecUb6OG-2l0wW554GYBQ');
+
+	define('RACINE','http://'.$_SERVER['SERVER_NAME'].$_SERVER['PHP_SELF'].'');
+	function aff($a,$stop=true){echo 'Arret a la ligne '.__LINE__.' du fichier '.__FILE__.'<pre>';var_dump($a);echo '</pre>';if ($stop){exit();}}
+
 	// imgrefurl => site sources
 		
 	function Random_referer(){
@@ -59,43 +62,73 @@
 			</OpenSearchDescription>');
 		}
 	}
-	function parse_query($query,$start=0){
-		$page=file_curl_contents(URL.str_replace(' ','+',$query).'&start='.$start);
-		if (!$page){return false;}
+	function parse_query($query,$start=0,$img=false){
+
 		
-		preg_match_all(REGEX_WEB, $page, $r);
-		preg_match_all(REGEX_PAGES,$page,$p);
-		$p=count($p[2]);
-		$retour=array(
-			'links'=>$r[1],
-			'titles'=>$r[2],
-			'descriptions'=>$r[3],
-			'nb_pages'=>$p,
-			'current_page'=>$start,
-			'query'=>$query
-			);
-		return $retour;
-		
-			
+		if (!$img){ // web
+			$page=file_curl_contents(URL.str_replace(' ','+',$query).'&start='.$start);
+			if (!$page){return false;}
+			preg_match_all(REGEX_WEB, $page, $r);
+			preg_match_all(REGEX_PAGES,$page,$p);
+			$p=count($p[2]);
+			$retour=array(
+				'links'=>$r[1],
+				'titles'=>$r[2],
+				'descriptions'=>$r[3],
+				'nb_pages'=>$p,
+				'current_page'=>$start,
+				'query'=>$query
+				);
+			return $retour;
+		}else{ //images
+			$page=file_curl_contents(URL.str_replace(' ','+',$query).URLIMG.'&start='.$start);			
+			if (!$page){return false;}
+			preg_match_all(REGEX_IMG,$page,$r);
+			preg_match_all(REGEX_PAGES,$page,$p);
+			preg_match_all(REGEX_THMBS,$page,$t);
+			$p=count($p[2]);
+			$retour=array(
+				'links'=>$r[1],
+				'h'=>$r[2],
+				'w'=>$r[3],
+				'sz'=>$r[4],
+				'thumbs'=>$t[0],
+				'nb_pages'=>$p,
+				'current_page'=>$start,
+				'query'=>$query
+				);
+			return $retour;		
+		}
 	}
 
 	function render_query($array){
 		if (!is_array($array)||count($array)==0){return false;}
-		
-		foreach ($array['links'] as $nb => $link){
-			$r=str_replace('#link',$link,TPL);
-			$r=str_replace('#title',$array['titles'][$nb],$r);
-			$d=str_replace('<br>','',$array['descriptions'][$nb]);
-			$d=str_replace('<br/>','',$d);
-			$r=str_replace('#description',$d,$r);
-			echo $r;
+		if (!isset($array['sz'][0])){
+			foreach ($array['links'] as $nb => $link){
+				$r=str_replace('#link',$link,TPL);
+				$r=str_replace('#title',$array['titles'][$nb],$r);
+				$d=str_replace('<br>','',$array['descriptions'][$nb]);
+				$d=str_replace('<br/>','',$d);
+				$r=str_replace('#description',$d,$r);
+				echo $r;
+			}
+			$img='';
+		}else{
+			foreach ($array['links'] as $nb => $link){
+				$r=str_replace('#link',$link,TPLIMG);
+				$r=str_replace('#SZ',$array['sz'][$nb],$r);
+				$r=str_replace('#H',$array['h'][$nb],$r);
+				$r=str_replace('#W',$array['w'][$nb],$r);
+				$r=str_replace('#thumbs',$array['thumbs'][$nb].'/>',$r);
+				echo $r;
+			}	
+			$img='&img';		
 		}
-		
 		
 		echo '<hr/><p class="footerlogo">'.LOGO1.str_repeat('<em class="o2">o</em>', $array['nb_pages']-1).LOGO2.'</p><div class="pagination">';
 		for ($i=0;$i<$array['nb_pages']-1;$i++){
 			if ($i*10==$array['current_page']){echo '<em>'.($i+1).'</em>';}
-			else{echo '<a href="?q='.$array['query'].'&start='.$i.'0">'.($i+1).'</a>';}
+			else{echo '<a href="?q='.$array['query'].$img.'&start='.$i.'0">'.($i+1).'</a>';}
 		}
 		echo  '</div>';
 	}
@@ -111,22 +144,23 @@
 	<style>
 		*{-webkit-box-sizing: border-box;-moz-box-sizing: border-box;box-sizing: border-box;}
 		body{padding:0;margin:0;}
-		aside{padding:0 25px 50px;}
+		aside{padding:0 25px 100px;}
 		a {text-decoration: none; }
 		hr{border:none;border-top:1px solid #aaa;}
 		form{margin-bottom:20px;}
-		header{font-size:85px;text-align:center;width:auto;background-color:#eee;padding-bottom:20px;border-bottom:1px 
-
-solid #ddd;}
-		header em{font-style: normal;text-shadow:0 1px 2px #555;-webkit-touch-callout: none; -webkit-user-select: none; -
-
-khtml-user-select: none; -moz-user-select: none; -ms-user-select: none; user-select: none;}
+		header{font-size:85px;text-align:center;width:auto;background-color:#eee;padding-bottom:20px;border-bottom:1px solid #ddd;}
+		header em{font-style: normal;text-shadow:0 1px 2px #555;-webkit-touch-callout: none; -webkit-user-select: none; -khtml-user-select: none; -moz-user-select: none; -ms-user-select: none; user-select: none;}
 		 em.g{color:blue;}
 		 em.o1{color:red;}
 		 em.o2{color:orange;}
 		 em.l{color:green;}
 		header .mini{font-size:14px;padding:0 0 0 220px;margin:0;margin-top:-15px;text-shadow:0 0 3px red;}
-		input[type=text]{height:30px;width:30%;min-width:250px;border-radius: 3px; padding:3px;border:1px solid #ccc;}
+		nav{padding-left:35px;background-color:white;border-bottom:1px solid #ccc;}
+		nav li{border-bottom:4px solid transparent;background-color:white; display:inline-block;list-style:none;width:100px;height:30px;font-size:18px;font-family: arial, sans-serif;text-align: center;}
+		nav li.active{color:red;font-weight: bold;border-bottom:4px solid red;}
+		nav li a{color:#666;}
+		nav li a:hover{color:#111;}
+		input[type=text]{height:30px;width:30%;min-width:230px;border-radius: 3px; padding:3px;border:1px solid #ccc;}
 		input[type=text]:hover{border-color:#aaa;}
 		input[type=submit]{height:30px;width:40px;font-size:14px;background-color:#4a8cf7;border:1px solid #397be6;border-radius: 3px;color:#eee; }
 		input[type=submit]:hover{background-color:#397be6;border-color:#286ad5 }
@@ -136,15 +170,21 @@ khtml-user-select: none; -moz-user-select: none; -ms-user-select: none; user-sel
 		.result h3 {text-decoration: underline; color:#00B!important;}
 		.result .title{margin-bottom:0;}
 		.result .description{margin-top:3px;}
-		.pagination{font-size:18px!important;text-align:center;width:100%;padding-top:5px;}
-		.pagination a{text-decoration: none;padding:5px;border-radius: 4px;}
+		.image{display:inline-block;margin:10px;text-align: center;}
+		.image p{margin:0;padding: 0;}
+		.image img{border:1px solid transparent;border-radius: 4px; box-shadow: 0 1px 2px #555}
+		.image img:hover{border:1px solid #333;}
+		.pagination{font-size:18px!important;text-align:center;width:auto;padding-top:5px;}
+		.pagination a{text-decoration: none;padding:5px;border-radius: 4px;display:inline-block;}
 		.pagination a:hover{background-color:#DDD;}
-		.pagination em{padding:5px;background-color:#CCC;border-radius: 4px;}
+		.pagination em{padding:5px;background-color:#CCC;border-radius: 4px;display:inline-block;}
 		.footerlogo{text-align:center;padding:0;margin:0;font-size:22px;font-weight:bold;user-select: none;-webkit-user-select: none;}
-		.footerlogo em{font-style: normal;}
+		.footerlogo em{font-style: normal;display:inline-block;}
 		footer{position:fixed;bottom:0;left:0;right:0;height:auto;min-height:40px;border-top:solid 1px #ddd;margin-top:30px;background-color:#EEE;text-align: right;color:#555;line-height: 30px;padding-right:10px;padding-bottom:5px;}
 		footer a{color:#444;font-weight: bold;}
 	</style>
+	<link rel="shortcut icon" href="favicon.png" /> 
+	<link rel="search" type="application/opensearchdescription+xml" title="Googol G sans mensonge" href="'<?php echo RACINE;?>googol.xml">
 	<!--[if IE]><script> document.createElement("article");document.createElement("aside");document.createElement
 
 ("section");document.createElement("footer");</script> <![endif]-->
@@ -157,8 +197,14 @@ khtml-user-select: none; -moz-user-select: none; -ms-user-select: none; user-sel
 	<input type="text" name="q" placeholder="Rechercher" value="<?php echo $q; ?>"/><input type="submit" value="OK"/>
 	</form>
 </header>
+<nav>
+<?php 
+	if (!$img){echo '<li class="active">Web</li><li><a href="'.RACINE.'?q='.$q.'&img">Images</a></li>';}
+	else{echo '<li><a href="'.RACINE.'?q='.$q.'">Web</a></li><li class="active">Images</li>';}
+?>
+</nav>
 <aside>
-	<?php if ($q!=''){render_query(parse_query($q,$start));} ?>
+	<?php if ($q!=''){render_query(parse_query($q,$start,$img));} ?>
 </aside>
 <footer>Googol est une niaiserie de <a href="http://warriordudimanche.net">Bronco - warriordudimanche.net</a>  (voir sur <a 
 
