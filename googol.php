@@ -128,7 +128,7 @@
 		echo '<hr/><p class="footerlogo">'.LOGO1.str_repeat('<em class="o2">o</em>', $array['nb_pages']-1).LOGO2.'</p><div class="pagination">';
 		for ($i=0;$i<$array['nb_pages']-1;$i++){
 			if ($i*10==$array['current_page']){echo '<em>'.($i+1).'</em>';}
-			else{echo '<a href="?q='.$array['query'].$img.'&start='.$i.'0">'.($i+1).'</a>';}
+			else{echo '<a href="?q='.htmlentities($array['query']).$img.'&start='.$i.'0">'.($i+1).'</a>';}
 		}
 		echo  '</div>';
 	}
@@ -194,13 +194,13 @@
 	<?php echo LOGO1.LOGO2; ?>
 	<p class="mini">DTC</p>
 	<form action="" method="get" >
-	<input type="text" name="q" placeholder="Rechercher" value="<?php echo $q; ?>"/><input type="submit" value="OK"/>
+	<input type="text" name="q" placeholder="Rechercher" value="<?php echo htmlentities($q); ?>"/><input type="submit" value="OK"/>
 	</form>
 </header>
 <nav>
 <?php 
-	if (!$img){echo '<li class="active">Web</li><li><a href="?q='.$q.'&img">Images</a></li>';}
-	else{echo '<li><a href="?q='.$q.'">Web</a></li><li class="active">Images</li>';}
+	if (!$img){echo '<li class="active">Web</li><li><a href="?q='.htmlentities($q).'&img">Images</a></li>';}
+	else{echo '<li><a href="?q='.htmlentities($q).'">Web</a></li><li class="active">Images</li>';}
 ?>
 </nav>
 <aside>
