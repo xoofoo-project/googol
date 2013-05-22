@@ -119,7 +119,8 @@
 				$r=str_replace('#W',$array['w'][$nb],$r);
 				$r=str_replace('#thumbs',$array['thumbs'][$nb].'/>',$r);
 				echo $r;
-			}	
+			}
+			$img='&img';
 		}
 
 		if($array['nb_pages'] != 0){
