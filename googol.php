@@ -127,7 +127,7 @@
 			echo '<hr/><p class="footerlogo">'.LOGO1.str_repeat('<em class="o2">o</em>', $array['nb_pages']-1).LOGO2.'</p><div class="pagination">';
 		}
 		else{
-			echo "<div class=\"noresult\"> Pas de resultats </div>";
+			echo '<div class="noresult"> Pas de resultat </div>';
 		}
 
 		for ($i=0;$i<$array['nb_pages']-1;$i++){
