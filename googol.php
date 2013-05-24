@@ -25,14 +25,14 @@
 		if (!is_dir('thumbs')){mkdir('thumbs');}// crée le dossier thumbs si nécessaire
 	}
 	$lang['fr']=array(
-		'previous'=>htmlspecialchars('Page précédente', ENT_QUOTES, 'UTF-8'),
+		'previous'=>htmlspecialchars('Page précédente'),
 		'next'=>'Page suivante',
-		'The thumbnails are temporarly stored in this server to hide your ip from Google...'=>htmlspecialchars('les miniatures sont temporairement récupérées sur ce serveur, google n\'a pas votre IP...', ENT_QUOTES, 'UTF-8'),
-		'Search anonymously on Google (direct links, fake referer)'=>htmlspecialchars('Rechercher anonymement sur Google (liens directs et referrer caché)', ENT_QUOTES, 'UTF-8'),
-		'Free and open source (please keep a link to warriordudimanche.net for the author ^^)'=>htmlspecialchars('Libre et open source, merci de laisser un lien vers warriordudimanche.net pour citer l\'auteur ;)', ENT_QUOTES, 'UTF-8'),
+		'The thumbnails are temporarly stored in this server to hide your ip from Google...'=>htmlspecialchars('les miniatures sont temporairement récupérées sur ce serveur, google n\'a pas votre IP...'),
+		'Search anonymously on Google (direct links, fake referer)'=>htmlspecialchars('Rechercher anonymement sur Google (liens directs et referrer caché)'),
+		'Free and open source (please keep a link to warriordudimanche.net for the author ^^)'=>htmlspecialchars('Libre et open source, merci de laisser un lien vers warriordudimanche.net pour citer l\'auteur ;)'),
 		'Googol - google without lies'=>'Googol - google sans mensonge',
 		'on GitHub'=>'sur GitHub',
-		'no results'=>htmlspecialchars('pas de résultat', ENT_QUOTES, 'UTF-8'),
+		'no results'=>htmlspecialchars('pas de résultat'),
 		'by'=>'par',
 		'search '=>'recherche ',
 		'Search'=>'Rechercher',
