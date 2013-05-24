@@ -14,6 +14,7 @@
 	define('VERSION','v1.1');
 	define('LANGUAGE',$langue);
 	define('RACINE','http://'.$_SERVER['SERVER_NAME']);
+	define('USE_WEB_OF_TRUST',true);
 	define('USE_GOOGLE_THUMBS',false);
 	// true = googol utilise les miniatures de google (c'est l'ip du visiteur que google verra mais c'est rapide et sans charge pour le servuer hébergeant googol)
 	// false = c'est le serveur googol qui télécharge les miniatures (ip user cachée à google, il ne verra que l'ip du serveur, mais c'est sensiblement plus lent)
@@ -287,9 +288,7 @@
 	<?php if ($q!=''){render_query(parse_query($q,$start,$img));} ?>
 </aside>
 <footer><a href="<?php echo RACINE;?>">Googol</a> <?php echo msg('by');?> <a href="http://warriordudimanche.net">Bronco - warriordudimanche.net</a> <a href="#" title="<?php echo msg('Free and open source (please keep a link to warriordudimanche.net for the author ^^)');?>"><em>Licence</em></a>  <a href="https://github.com/broncowdd/googol" title="<?php echo msg('on GitHub');?>"><img width="32" src="github.png" alt="logoGH"/></a> <a href="http://flattr.com/thing/1319925/broncowddSnippetVamp-on-GitHub" target="_blank"><img src="http://images.warriordudimanche.net/flattr.png" alt="Flattr this" title="Flattr this" border="0" /></a><a href="http://duckduckgo.com" title="<?php echo msg('Otherwise, use a real Search engine !');?>"><img src="ddg.png" alt="ddg icon"/></a></footer>
-<script type="text/javascript" src="http://api.mywot.com/widgets/ratings.js"></script> 
-
+<?php if(USE_WEB_OF_TRUST){echo '<script type="text/javascript" src="http://api.mywot.com/widgets/ratings.js"></script>';}?> 
 </body>
-
 </html>
 <?php add_search_engine(); ?>
