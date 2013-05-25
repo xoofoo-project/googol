@@ -27,14 +27,14 @@
 		if (!is_dir('thumbs')){mkdir('thumbs');}// crée le dossier thumbs si nécessaire
 	}
 	$lang['fr']=array(
-		'previous'=>htmlentities('Page précédente', ENT_QUOTES, 'UTF-8'),
+		'previous'=>htmlspecialchars('Page précédente'),
 		'next'=>'Page suivante',
-		'The thumbnails are temporarly stored in this server to hide your ip from Google...'=>htmlentities('les miniatures sont temporairement récupérées sur ce serveur, google n\'a pas votre IP...', ENT_QUOTES, 'UTF-8'),
-		'Search anonymously on Google (direct links, fake referer)'=>htmlentities('Rechercher anonymement sur Google (liens directs et referrer caché)', ENT_QUOTES, 'UTF-8'),
-		'Free and open source (please keep a link to warriordudimanche.net for the author ^^)'=>htmlentities('Libre et open source, merci de laisser un lien vers warriordudimanche.net pour citer l\'auteur ;)', ENT_QUOTES, 'UTF-8'),
+		'The thumbnails are temporarly stored in this server to hide your ip from Google...'=>htmlspecialchars('les miniatures sont temporairement récupérées sur ce serveur, google n\'a pas votre IP...'),
+		'Search anonymously on Google (direct links, fake referer)'=>htmlspecialchars('Rechercher anonymement sur Google (liens directs et referrer caché)'),
+		'Free and open source (please keep a link to warriordudimanche.net for the author ^^)'=>htmlspecialchars('Libre et open source, merci de laisser un lien vers warriordudimanche.net pour citer l\'auteur ;)'),
 		'Googol - google without lies'=>'Googol - google sans mensonge',
 		'on GitHub'=>'sur GitHub',
-		'no results'=>htmlentities('pas de résultat', ENT_QUOTES, 'UTF-8'),
+		'no results'=>htmlspecialchars('pas de résultat'),
 		'by'=>'par',
 		'search '=>'recherche ',
 		'Search'=>'Rechercher',
@@ -206,7 +206,7 @@
 <!DOCTYPE html>
 <html dir="ltr" lang="fr">
 <head>
-	<title><?php echo htmlentities($title, ENT_QUOTES, 'UTF-8'); ?> </title>
+	<title><?php echo htmlspecialchars($title); ?> </title>
 	<?php if (is_file('favicon.png')){echo '<link rel="shortcut icon" href="favicon.png" /> ';}?>
 	<link rel="stylesheet" type="text/css" href="<?php echo THEME;?>"  media="screen" />
 	<link rel="search" type="application/opensearchdescription+xml" title="<?php echo msg('Googol - google without lies'); ?>" href="<?php echo RACINE;?>/googol.xml">
@@ -216,18 +216,18 @@
 <header>
 	<p class="langue"><a class="<?php is_active(LANGUAGE,'fr'); ?>" href="?lang=fr">FR</a> <a class="<?php is_active(LANGUAGE,'en'); ?>" href="?lang=en">EN</a></p>
 	<?php echo LOGO1.LOGO2; ?>
-	<p class="mini"><?php echo htmlentities(VERSION, ENT_QUOTES, 'UTF-8'); ?></p><p class="msg"><?php echo msg('Search anonymously on Google (direct links, fake referer)'); if ($img){echo '<br/>'.msg('The thumbnails are temporarly stored in this server to hide your ip from Google...');}  ?> </p>
+	<p class="mini"><?php echo htmlspecialchars(VERSION); ?></p><p class="msg"><?php echo msg('Search anonymously on Google (direct links, fake referer)'); if ($img){echo '<br/>'.msg('The thumbnails are temporarly stored in this server to hide your ip from Google...');}  ?> </p>
 	<form action="" method="get" >
 		<input type="hidden" name="lang" value="<?php echo LANGUAGE;?>"/>
-	<input type="text" name="q" placeholder="<?php echo msg('Search'); ?>" value="<?php echo htmlentities($q, ENT_QUOTES, 'UTF-8'); ?>"/><input type="submit" value="OK"/>
+	<input type="text" name="q" placeholder="<?php echo msg('Search'); ?>" value="<?php echo htmlspecialchars($q); ?>"/><input type="submit" value="OK"/>
 	<?php if ($img){echo '<input type="hidden" name="img"/>';}?>
 	</form>
 
 </header>
 <nav>
 <?php 
-	if (!$img){echo '<li class="active">Web</li><li><a href="?q='.htmlentities($q, ENT_QUOTES, 'UTF-8').'&img">Images</a></li>';}
-	else{echo '<li><a href="?q='.htmlentities($q, ENT_QUOTES, 'UTF-8').'">Web</a></li><li class="active">Images</li>';}
+	if (!$img){echo '<li class="active">Web</li><li><a href="?q='.htmlspecialchars($q).'&img">Images</a></li>';}
+	else{echo '<li><a href="?q='.htmlspecialchars($q).'">Web</a></li><li class="active">Images</li>';}
 ?>
 </nav>
 <aside>

@@ -1,0 +1,54 @@
+		*{-webkit-box-sizing: border-box;-moz-box-sizing: border-box;box-sizing: border-box;}
+		body{padding:0;margin:0;font-family:arial, sans-serif;}
+		aside{padding:0 25px 100px;}
+		a {text-decoration: none; }
+		hr{border:none;border-top:1px solid #aaa;}
+		form{margin-bottom:20px;padding:0;line-height:20px;}
+		header{text-align:center;width:auto;background-color:#ddd;padding-bottom:20px;padding-top:0;border-bottom:1px solid #ddd;}
+		header,footer{
+			background-image: -moz-linear-gradient(top, #eeeeee, #cccccc);
+			background-image: -ms-linear-gradient(top, #eeeeee, #cccccc);
+			background-image: -o-linear-gradient(top, #eeeeee, #cccccc);
+			background-image: -webkit-gradient(linear, center top, center bottom, from(#eeeeee), to(#cccccc));
+			background-image: -webkit-linear-gradient(top, #eeeeee, #cccccc);
+			background-image: linear-gradient(top, #eeeeee, #cccccc);
+		}
+		header em{font-family:Georgia, Times, serif;font-size:80px;font-style: normal;text-shadow:0 1px 2px #555;-webkit-touch-callout: none; -webkit-user-select: none; -khtml-user-select: none; -moz-user-select: none; -ms-user-select: none; user-select: none;}
+		em.g{color:blue;}em.o1{color:red;}em.o2{color:orange;}em.l{color:green;}
+		header .mini{font-size:14px;padding:0 0 0 220px;margin:0;margin-top:-15px;text-shadow:0 1px 1px white;}
+		header .msg{font-size:16px;color:#444;font-style:italic;text-shadow:0 1px 1px #FFF;}
+		header .langue{margin:0;padding:0;padding-right:20px;text-align:right;font-weight: bold}
+		header .langue a:hover{color:black;}
+		header .langue a{color:#444;}
+		nav{padding-left:35px;background-color:white;border-bottom:1px solid #ccc;}
+		nav li{border-bottom:4px solid transparent;background-color:white; display:inline-block;list-style:none;width:100px;height:30px;font-size:18px;text-align: center;padding-top:4px;}
+		nav li.active,header .langue a.active{color:red;font-weight: bold;border-bottom:4px solid red;}
+		nav li a{color:#666;}
+		nav li a:hover{color:#111;}
+		input[type=text]{font-size:16px;height:30px;width:30%;min-width:200px;border-radius: 3px; padding:3px;border:1px solid #ccc;box-shadow: inset 0 1px 2px #ddd}
+		input[type=text]:hover{border-color:#aaa;}
+		input[type=submit]{height:30px;width:40px;font-size:14px;background-color:#4a8cf7;border:1px solid #397be6;border-radius: 3px;color:#eee; box-shadow:  0 1px 2px #397be6}
+		input[type=submit]:hover{background-color:#397be6;border-color:#286ad5 }
+		input[type=submit]:active{background-color:#397be6;border-color:transparent;border-top:2px solid transparent;box-shadow:  0 0px 1px #397be6;}
+		.result{padding:0 10px ;margin:0;border-radius:3px;word-wrap:break-word;overflow-wrap: break-word;-webkit-hyphens:auto;-moz-hyphens:auto;-ms-hyphens:auto;}
+		.result:hover,.image:hover{background-color:#EEE;}
+		.result a {color:#0B0;}
+		.result h3 {text-decoration: underline; color:#00B!important;}
+		.result .title{margin-bottom:0;}
+		.result .description{margin-top:3px;}
+		.image{display:inline-block;padding:5px; margin:5px;text-align: center;border-radius:3px;}
+		.image p{margin:0;padding: 0;}
+		.image .description{font-size: 12px;}
+		.image img{border:1px solid transparent;border-radius: 4px; box-shadow: 0 1px 2px #555}
+		.image img:hover{border:1px solid #333;}
+		.pagination{font-size:18px!important;text-align:center;width:auto;padding-top:5px;}
+		.pagination a{text-decoration: none;padding:5px;border-radius: 4px;display:inline-block;}
+		.pagination a:hover{background-color:#DDD;}
+		.pagination em{padding:5px;background-color:#CCC;border-radius: 4px;display:inline-block;}
+		.pagination .next,.pagination .previous{display:inline-block;width: 50px;}
+		.footerlogo{text-align:center;padding:0;margin:0;font-size:22px;font-weight:bold;user-select: none;-webkit-user-select: none;}
+		.footerlogo em{font-style: normal;display:inline-block;}
+		footer{position:fixed;bottom:0;left:0;right:0;height:auto;min-height:40px;border-top:solid 1px #ddd;margin-top:30px;background-color:#EEE;text-align: right;color:#555;line-height: 30px;padding-right:10px;padding-bottom:5px;}
+		footer a{color:#444;font-weight: bold;}
+		footer img{vertical-align: middle}
+		.noresult{text-align:center;margin-top:5px;}
