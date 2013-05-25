@@ -207,8 +207,7 @@
 <html dir="ltr" lang="fr">
 <head>
 	<title><?php echo htmlentities($title, ENT_QUOTES, 'UTF-8'); ?> </title>
-	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
-    <meta charset="UTF-8">
+	
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<?php if (is_file('favicon.png')){echo '<link rel="shortcut icon" href="favicon.png" /> ';}?>
 	<link rel="stylesheet" type="text/css" href="<?php echo THEME;?>"  media="screen" />
