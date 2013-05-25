@@ -106,7 +106,7 @@
 				'descriptions'=>$r[3],
 				'nb_pages'=>$p,
 				'current_page'=>$start,
-				'query'=>htmlspecialchars($query)
+				'query'=>$query
 				);
 			return $retour;
 		}else{ //images
@@ -127,7 +127,7 @@
 				'thumbs_h'=>$t[1],
 				'nb_pages'=>$p,
 				'current_page'=>$start,
-				'query'=>htmlspecialchars($query)
+				'query'=>$query
 				);			
 			return $retour;		
 		}
@@ -268,7 +268,7 @@
 </head>
 <body>
 <header>
-	<p class="langue"><a class="<?php is_active(LANGUAGE,'fr'); ?>" href="?&lang=fr">FR</a> <a class="<?php is_active(LANGUAGE,'en'); ?>" href="?lang=en">EN</a></p>
+	<p class="langue"><a class="<?php is_active(LANGUAGE,'fr'); ?>" href="?lang=fr">FR</a> <a class="<?php is_active(LANGUAGE,'en'); ?>" href="?lang=en">EN</a></p>
 	<?php echo LOGO1.LOGO2; ?>
 	<p class="mini"><?php echo htmlspecialchars(VERSION); ?></p><p class="msg"><?php echo msg('Search anonymously on Google (direct links, fake referer)'); if ($img){echo '<br/>'.msg('The thumbnails are temporarly stored in this server to hide your ip from Google...');}  ?> </p>
 	<form action="" method="get" >
