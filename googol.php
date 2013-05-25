@@ -95,7 +95,7 @@
 	}
 	function parse_query($query,$start=0,$img=false){
 		if (!$img){ // web
-			$page=file_curl_contents(URL.str_replace(' ','+',$query).'&start='.$start);
+			$page=file_curl_contents(URL.str_replace(' ','+',urlencode($query)).'&start='.$start);
 			if (!$page){return false;}
 			preg_match_all(REGEX_WEB, $page, $r);
 			preg_match_all(REGEX_PAGES,$page,$p);
@@ -110,7 +110,7 @@
 				);
 			return $retour;
 		}else{ //images
-			$page=file_curl_contents(URL.str_replace(' ','+',$query).URLIMG.'&start='.$start);			
+			$page=file_curl_contents(URL.str_replace(' ','+',urlencode($query)).URLIMG.'&start='.$start);			
 			if (!$page){return false;}
 			preg_match_all(REGEX_IMG,$page,$r);
 			preg_match_all(REGEX_PAGES,$page,$p);
