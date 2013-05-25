@@ -207,6 +207,9 @@
 <html dir="ltr" lang="fr">
 <head>
 	<title><?php echo htmlentities($title, ENT_QUOTES, 'UTF-8'); ?> </title>
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<?php if (is_file('favicon.png')){echo '<link rel="shortcut icon" href="favicon.png" /> ';}?>
 	<link rel="stylesheet" type="text/css" href="<?php echo THEME;?>"  media="screen" />
 	<link rel="search" type="application/opensearchdescription+xml" title="<?php echo msg('Googol - google without lies'); ?>" href="<?php echo RACINE;?>/googol.xml">
@@ -214,15 +217,15 @@
 </head>
 <body>
 <header>
-	<p class="langue"><a class="<?php is_active(LANGUAGE,'fr'); ?>" href="?lang=fr">FR</a> <a class="<?php is_active(LANGUAGE,'en'); ?>" href="?lang=en">EN</a></p>
-	<?php echo LOGO1.LOGO2; ?>
-	<p class="mini"><?php echo htmlentities(VERSION, ENT_QUOTES, 'UTF-8'); ?></p><p class="msg"><?php echo msg('Search anonymously on Google (direct links, fake referer)'); if ($img){echo '<br/>'.msg('The thumbnails are temporarly stored in this server to hide your ip from Google...');}  ?> </p>
+	<p class="top"><span class="version"> <?php echo htmlentities(VERSION, ENT_QUOTES, 'UTF-8'); ?></span><a class="<?php is_active(LANGUAGE,'fr'); ?>" href="?lang=fr">FR</a> <a class="<?php is_active(LANGUAGE,'en'); ?>" href="?lang=en">EN</a></p>
+	
 	<form action="" method="get" >
 		<input type="hidden" name="lang" value="<?php echo LANGUAGE;?>"/>
-	<input type="text" name="q" placeholder="<?php echo msg('Search'); ?>" value="<?php echo htmlentities($q, ENT_QUOTES, 'UTF-8'); ?>"/><input type="submit" value="OK"/>
+	<span class="logo"><?php echo LOGO1.LOGO2; ?></span><span><input type="text" name="q" placeholder="<?php echo msg('Search'); ?>" value="<?php echo htmlentities($q, ENT_QUOTES, 'UTF-8'); ?>"/><input type="submit" value="OK"/></span>
 	<?php if ($img){echo '<input type="hidden" name="img"/>';}?>
 	</form>
-
+<p class="msg"><?php echo msg('Search anonymously on Google (direct links, fake referer)'); if ($img){echo '<br/>'.msg('The thumbnails are temporarly stored in this server to hide your ip from Google...');}  ?> </p>
+	
 </header>
 <nav>
 <?php 
