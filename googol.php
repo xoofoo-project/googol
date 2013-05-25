@@ -226,8 +226,8 @@
 </header>
 <nav>
 <?php 
-	if (!$img){echo '<li class="active">Web</li><li><a href="?q='.htmlentities($q, ENT_QUOTES, 'UTF-8').'&img">Images</a></li>';}
-	else{echo '<li><a href="?q='.htmlentities($q, ENT_QUOTES, 'UTF-8').'">Web</a></li><li class="active">Images</li>';}
+	if (!$img){echo '<li class="active">Web</li><li><a href="?q='.htmlentities($q, ENT_QUOTES, 'UTF-8').'&img&lang='.$langue.'">Images</a></li>';}
+	else{echo '<li><a href="?q='.htmlentities($q, ENT_QUOTES, 'UTF-8').'&lang='.$langue.'">Web</a></li><li class="active">Images</li>';}
 ?>
 </nav>
 <aside>
