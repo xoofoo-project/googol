@@ -40,6 +40,8 @@
 		.result h3 {text-decoration: underline; color:#00B!important;}
 		.result .title{margin-bottom:0;}
 		.result .description{margin-top:3px;}
+		.web #wot-tooltip{display:none!important;}
+
 		.image{display:inline-block;padding:5px; margin:5px;text-align: center;border-radius:3px;}
 		.image p{margin:0;padding: 0;}
 		.image .description{font-size: 12px;}
@@ -57,3 +59,10 @@
 		footer img{vertical-align: middle}
 		.noresult{text-align:center;margin-top:5px;color:#444;}
 		.noresult em{color:black;font-weight: bold;}
+		
+		.wot, .ddg, .github{background:url(sprite.png) no-repeat ;display:inline-block;vertical-align:middle;}
+		a.wot{background-position: 0 -163px; width: 32px; height: 15px;}
+		.ddg{ background-position: 0 0; width: 32px; height: 31px; } 
+		.github{ background-position: 0 -81px; width: 39px; height: 32px; } 
+		
+

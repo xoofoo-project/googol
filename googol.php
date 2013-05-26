@@ -1,20 +1,23 @@
 <?php
 	if (isset($_GET['lang'])){$langue=$_GET['lang'];}else{$langue=lang();}
 	clear_cache();// vire les thumbs de plus de trois minutes (THUMB_EXPIRE_DELAY)
+	define('USE_WEB_OF_TRUST',true);
+	define('WOT_URL','http://www.mywot.com/scorecard/');
 	define('REGEX_WEB','#(?<=<h3 class="r"><a href="/url\?q=)([^&]+).*?>(.*?)</a>.*?(?<=<span class="st">)(.*?)(?=</span>)#');
 	define('REGEX_PAGES','#&start=([0-9]+)|&amp;start=([0-9]+)#');
 	define('REGEX_IMG','#(?<=imgurl=)(.*?)&amp;imgrefurl=(.*?)&amp;.*?h=([0-9]+)&amp;w=([0-9]+)&amp;sz=([0-9]+)|(?<=imgurl=)(.*?)&imgrefurl=(.*?)&.*?h=([0-9]+)&w=([0-9]+)&sz=([0-9]+)#');
 	define('REGEX_THMBS','#<img.*?height="([0-9]+)".*?width="([0-9]+)".*?src="([^"]+)"#');
-	define('TPL','<div class="result"><a href="#link"><h3 class="title">#title</h3>#link</a><p class="description">#description</p></div>');
+	define('TPL','<div class="result"><a href="#link"><h3 class="title">#title</h3>#link</a>#wot<p class="description">#description</p></div>');
 	define('TPLIMG','<div class="image" ><p><a href="#link" title="#link">#thumbs</a></p><p class="description">#W x #H (#SZ ko)<a class="source" href="#site" title="#site"> &#9658;</a></p></div>');
 	define('LOGO1','<em class="g">G</em><em class="o1">o</em>');
 	define('LOGO2','<em class="o2">o</em><em class="g">g</em><em class="o1">o</em><em class="l">l</em>');
 	define('URLIMG','&tbm=isch&biw=1920&bih=1075&sei=v5ecUb6OG-2l0wW554GYBQ');
 	define('VERSION','v1.2b');
+
 	define('LANGUAGE',$langue);
 	define('URL','https://www.google.com/search?hl='.LANGUAGE.'&q=');
 	define('RACINE','http://'.$_SERVER['SERVER_NAME']);
-	define('USE_WEB_OF_TRUST',true);
+	
 	define('USE_GOOGLE_THUMBS',false);
 	define('THEME','style_google.css');
 	// true = googol utilise les miniatures de google (c'est l'ip du visiteur que google verra mais c'est rapide et sans charge pour le servuer hébergeant googol)
@@ -148,6 +151,11 @@
 				$d=str_replace('<br>','',$array['descriptions'][$nb]);
 				$d=str_replace('<br/>','',$d);
 				$r=str_replace('#description',$d,$r);
+				if (preg_match('#http://(.*?)/#',$link,$domaine)){
+					$domaine='<a class="wot-exclude wot" href="'.WOT_URL.$domaine[1].'" title="View scorecard"> </a>';
+					$r=str_replace('#wot',$domaine,$r);
+				}else{$r=str_replace('#wot','',$r);}
+
 				echo $r;
 			}
 			$img='';
@@ -221,7 +229,7 @@
 	<link rel="search" type="application/opensearchdescription+xml" title="<?php echo msg('Googol - google without lies'); ?>" href="<?php echo RACINE;?>/googol.xml">
 	<!--[if IE]><script> document.createElement("article");document.createElement("aside");document.createElement("section");document.createElement("footer");</script> <![endif]-->
 </head>
-<body>
+<body class="<?php if ($img){echo 'images';}else{echo 'web';}?>">
 <header>
 	<p class="top"><span class="version"> <?php echo htmlentities(VERSION, ENT_QUOTES, 'UTF-8'); ?></span><a class="<?php is_active(LANGUAGE,'fr'); ?>" href="?lang=fr">FR</a> <a class="<?php is_active(LANGUAGE,'en'); ?>" href="?lang=en">EN</a></p>
 	
@@ -242,7 +250,13 @@
 <aside>
 	<?php if ($q_raw!=''){render_query(parse_query($q_raw,$start,$img));} ?>
 </aside>
-<footer><a href="<?php echo RACINE;?>">Googol</a> <?php echo msg('by');?> <a href="http://warriordudimanche.net">Bronco - warriordudimanche.net</a> <a href="#" title="<?php echo msg('Free and open source (please keep a link to warriordudimanche.net for the author ^^)');?>"><em>Licence</em></a>  <a href="https://github.com/broncowdd/googol" title="<?php echo msg('on GitHub');?>"><img width="32" src="github.png" alt="logoGH"/></a> <a href="http://flattr.com/thing/1319925/broncowddSnippetVamp-on-GitHub" target="_blank"><img src="http://images.warriordudimanche.net/flattr.png" alt="Flattr this" title="Flattr this" border="0" /></a><a href="http://duckduckgo.com" title="<?php echo msg('Otherwise, use a real Search engine !');?>"><img src="ddg.png" alt="ddg icon"/></a></footer>
+<footer>
+	<a href="<?php echo RACINE;?>">Googol</a> <?php echo msg('by');?> 
+	<a href="http://warriordudimanche.net">Bronco - warriordudimanche.net</a> 
+	<a href="#" title="<?php echo msg('Free and open source (please keep a link to warriordudimanche.net for the author ^^)');?>"><em>Licence</em></a>  
+	<a href="https://github.com/broncowdd/googol" title="<?php echo msg('on GitHub');?>" class="github wot-exclude "> </a> <a href="http://flattr.com/thing/1319925/broncowddSnippetVamp-on-GitHub" target="_blank"><img src="http://images.warriordudimanche.net/flattr.png" alt="Flattr this" title="Flattr this" border="0" /></a>
+	<a href="http://duckduckgo.com" title="<?php echo msg('Otherwise, use a real Search engine !');?>" class="ddg wot-exclude "> </a>
+</footer>
 <?php if(USE_WEB_OF_TRUST){echo '<script type="text/javascript" src="http://api.mywot.com/widgets/ratings.js"></script>';}?> 
 </body>
 </html>
