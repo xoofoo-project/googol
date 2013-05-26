@@ -9,10 +9,10 @@
 	define('TPLIMG','<div class="image" ><p><a href="#link" title="#link">#thumbs</a></p><p class="description">#W x #H (#SZ ko)<a class="source" href="#site" title="#site"> &#9658;</a></p></div>');
 	define('LOGO1','<em class="g">G</em><em class="o1">o</em>');
 	define('LOGO2','<em class="o2">o</em><em class="g">g</em><em class="o1">o</em><em class="l">l</em>');
-	define('URL','https://www.google.fr/search?q=');
 	define('URLIMG','&tbm=isch&biw=1920&bih=1075&sei=v5ecUb6OG-2l0wW554GYBQ');
 	define('VERSION','v1.2b');
 	define('LANGUAGE',$langue);
+	define('URL','https://www.google.com/search?hl='.LANGUAGE.'&q=');
 	define('RACINE','http://'.$_SERVER['SERVER_NAME']);
 	define('USE_WEB_OF_TRUST',true);
 	define('USE_GOOGLE_THUMBS',false);
