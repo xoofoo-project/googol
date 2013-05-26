@@ -55,4 +55,5 @@
 		footer{position:fixed;bottom:0;left:0;right:0;height:auto;min-height:40px;border-top:solid 1px #ddd;margin-top:30px;background-color:#EEE;text-align: right;color:#555;line-height: 30px;padding-right:10px;padding-bottom:5px;}
 		footer a{color:#444;font-weight: bold;}
 		footer img{vertical-align: middle}
-		.noresult{text-align:center;margin-top:5px;}
+		.noresult{text-align:center;margin-top:5px;color:#444;}
+		.noresult em{color:black;font-weight: bold;}

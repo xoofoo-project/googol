@@ -34,7 +34,7 @@
 		'Free and open source (please keep a link to warriordudimanche.net for the author ^^)'=>htmlentities('Libre et open source, merci de laisser un lien vers warriordudimanche.net pour citer l\'auteur ;)', ENT_QUOTES, 'UTF-8'),
 		'Googol - google without lies'=>'Googol - google sans mensonge',
 		'on GitHub'=>'sur GitHub',
-		'no results'=>htmlentities('pas de résultat', ENT_QUOTES, 'UTF-8'),
+		'no results for'=>htmlentities('pas de résultat pour ', ENT_QUOTES, 'UTF-8'),
 		'by'=>'par',
 		'search '=>'recherche ',
 		'Search'=>'Rechercher',
@@ -62,6 +62,10 @@
 			'http://bienfaitpourvosgueul.es/‎',
 			'http://pandanstesdents.fr/‎',
 			'http://tupuessouslesbras.fr/‎',
+			'http://mangetescrottesdenez.fr/‎',
+			'http://jtepourristesstats.fr/‎',
+			'http://ontecompissevigoureusement.com/‎',
+			'http://lepoingleveetlemajeuraussi.com/‎',
 		);
 		shuffle($rr);
 		return $rr[0];
@@ -136,7 +140,7 @@
 
 	function render_query($array){
 		global $start,$langue;
-		if (!is_array($array)||count($array)==0){echo '<div class="noresult"> '.msg('no results').' </div>';return false;}
+		if (!is_array($array)||count($array['links'])==0){echo '<div class="noresult"> '.msg('no results for').' <em>'.$array['query'].'</em> </div>';return false;}
 		if (!isset($array['sz'][0])){
 			foreach ($array['links'] as $nb => $link){
 				$r=str_replace('#link',$link,TPL);
