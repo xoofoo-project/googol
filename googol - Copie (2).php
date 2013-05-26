@@ -1,25 +1,26 @@
 <?php
 	if (isset($_GET['lang'])){$langue=$_GET['lang'];}else{$langue=lang();}
-	clear_cache();// vire les thumbs de plus de trois minutes
-	define('RACINE','http://'.$_SERVER['SERVER_NAME']);
-	define('USE_WEB_OF_TRUST',true);
-	define('WOT_URL','http://www.mywot.com/scorecard/');
+	clear_cache();// vire les thumbs de plus de trois minutes (THUMB_EXPIRE_DELAY)
 	define('REGEX_WEB','#(?<=<h3 class="r"><a href="/url\?q=)([^&]+).*?>(.*?)</a>.*?(?<=<span class="st">)(.*?)(?=</span>)#');
 	define('REGEX_PAGES','#&start=([0-9]+)|&amp;start=([0-9]+)#');
 	define('REGEX_IMG','#(?<=imgurl=)(.*?)&amp;imgrefurl=(.*?)&amp;.*?h=([0-9]+)&amp;w=([0-9]+)&amp;sz=([0-9]+)|(?<=imgurl=)(.*?)&imgrefurl=(.*?)&.*?h=([0-9]+)&w=([0-9]+)&sz=([0-9]+)#');
 	define('REGEX_THMBS','#<img.*?height="([0-9]+)".*?width="([0-9]+)".*?src="([^"]+)"#');
-	define('TPL','<div class="result"><a href="#link"><h3 class="title">#title</h3>#link</a>#wot<p class="description">#description</p></div>');
+	define('TPL','<div class="result"><a href="#link"><h3 class="title">#title</h3>#link</a><p class="description">#description</p></div>');
 	define('TPLIMG','<div class="image" ><p><a href="#link" title="#link">#thumbs</a></p><p class="description">#W x #H (#SZ ko)<a class="source" href="#site" title="#site"> &#9658;</a></p></div>');
-	define('LOGO1','<a href="'.RACINE.'"><em class="g">G</em><em class="o1">o</em>');
-	define('LOGO2','<em class="o2">o</em><em class="g">g</em><em class="o1">o</em><em class="l">l</em></a>');
+	define('LOGO1','<em class="g">G</em><em class="o1">o</em>');
+	define('LOGO2','<em class="o2">o</em><em class="g">g</em><em class="o1">o</em><em class="l">l</em>');
+	define('URL','https://www.google.fr/search?q=');
 	define('URLIMG','&tbm=isch&biw=1920&bih=1075&sei=v5ecUb6OG-2l0wW554GYBQ');
-	define('VERSION','v1.2b');
+	define('VERSION','v1.1');
 	define('LANGUAGE',$langue);
-	define('URL','https://www.google.com/search?hl='.LANGUAGE.'&q=');
+	define('RACINE','http://'.$_SERVER['SERVER_NAME']);
+	define('USE_WEB_OF_TRUST',true);
 	define('USE_GOOGLE_THUMBS',false);
 	define('THEME','style_google.css');
+	// true = googol utilise les miniatures de google (c'est l'ip du visiteur que google verra mais c'est rapide et sans charge pour le servuer hébergeant googol)
+	// false = c'est le serveur googol qui télécharge les miniatures (ip user cachée à google, il ne verra que l'ip du serveur, mais c'est sensiblement plus lent)
 	
-	if (!USE_GOOGLE_THUMBS){ 
+	if (!USE_GOOGLE_THUMBS){ // on va télécharger temporairement les miniatures pour cacher l'ip du visiteur à google
 		session_start();
 		if (!isset($_SESSION['ID'])){$_SESSION['ID']=uniqid();}
 		define('UNIQUE_THUMBS_PATH','thumbs/'.$_SESSION['ID']);
@@ -33,7 +34,7 @@
 		'Free and open source (please keep a link to warriordudimanche.net for the author ^^)'=>htmlentities('Libre et open source, merci de laisser un lien vers warriordudimanche.net pour citer l\'auteur ;)', ENT_QUOTES, 'UTF-8'),
 		'Googol - google without lies'=>'Googol - google sans mensonge',
 		'on GitHub'=>'sur GitHub',
-		'no results for'=>htmlentities('pas de résultat pour ', ENT_QUOTES, 'UTF-8'),
+		'no results'=>htmlentities('pas de résultat', ENT_QUOTES, 'UTF-8'),
 		'by'=>'par',
 		'search '=>'recherche ',
 		'Search'=>'Rechercher',
@@ -61,10 +62,6 @@
 			'http://bienfaitpourvosgueul.es/‎',
 			'http://pandanstesdents.fr/‎',
 			'http://tupuessouslesbras.fr/‎',
-			'http://mangetescrottesdenez.fr/‎',
-			'http://jtepourristesstats.fr/‎',
-			'http://ontecompissevigoureusement.com/‎',
-			'http://lepoingleveetlemajeuraussi.com/‎',
 		);
 		shuffle($rr);
 		return $rr[0];
@@ -139,19 +136,14 @@
 
 	function render_query($array){
 		global $start,$langue;
-		if (!is_array($array)||count($array['links'])==0){echo '<div class="noresult"> '.msg('no results for').' <em>'.$array['query'].'</em> </div>';return false;}
+		if (!is_array($array)||count($array)==0){return false;}
 		if (!isset($array['sz'][0])){
 			foreach ($array['links'] as $nb => $link){
-				$r=str_replace('#link',urldecode($link),TPL);
+				$r=str_replace('#link',$link,TPL);
 				$r=str_replace('#title',$array['titles'][$nb],$r);
 				$d=str_replace('<br>','',$array['descriptions'][$nb]);
 				$d=str_replace('<br/>','',$d);
 				$r=str_replace('#description',$d,$r);
-				if (preg_match('#http://(.*?)/#',$link,$domaine)){
-					$domaine='<a class="wot-exclude wot" href="'.WOT_URL.$domaine[1].'" title="View scorecard"> </a>';
-					$r=str_replace('#wot',$domaine,$r);
-				}else{$r=str_replace('#wot','',$r);}
-
 				echo $r;
 			}
 			$img='';
@@ -178,15 +170,19 @@
 
 		if($array['nb_pages'] != 0){
 			echo '<hr/><p class="footerlogo">'.LOGO1.str_repeat('<em class="o2">o</em>', $array['nb_pages']-1).LOGO2.'</p><div class="pagination">';
-			if ($start>0){echo '<a class="previous" title="'.msg('previous').'" href="?q='.urlencode($array['query']).$img.'&start='.($start-10).'&lang='.$langue.'">&#9668;</a>';}
-			for ($i=0;$i<$array['nb_pages']-1;$i++){
-				if ($i*10==$array['current_page']){echo '<em>'.($i+1).'</em>';}
-				else{echo '<a href="?q='.urlencode($array['query']).$img.'&start='.$i.'0&lang='.$langue.'">'.($i+1).'</a>';}
-			}
-			if ($start<($array['nb_pages']-2)*10){echo '<a class="next" title="'.msg('next').'" href="?q='.urlencode($array['query']).$img.'&start='.($start+10).'&lang='.$langue.'">&#9658;</a>';}
-			
-			echo  '</div>';
 		}
+		else{
+			echo '<div class="noresult"> '.msg('no results').' </div>';
+		}
+
+		if ($start>0){echo '<a class="previous" title="'.msg('previous').'" href="?q='.urlencode($array['query']).$img.'&start='.($start-10).'&lang='.$langue.'">&#9668;</a>';}
+		for ($i=0;$i<$array['nb_pages']-1;$i++){
+			if ($i*10==$array['current_page']){echo '<em>'.($i+1).'</em>';}
+			else{echo '<a href="?q='.urlencode($array['query']).$img.'&start='.$i.'0&lang='.$langue.'">'.($i+1).'</a>';}
+		}
+		if ($start<($array['nb_pages']-2)*10){echo '<a class="next" title="'.msg('next').'" href="?q='.urlencode($array['query']).$img.'&start='.($start+10).'&lang='.$langue.'">&#9658;</a>';}
+		
+		echo  '</div>';
 	}
 	function grab_google_thumb($link){
 		if ($thumb=file_curl_contents($link)){
@@ -202,57 +198,42 @@
 
 
 	// Gestion GET
-	$img=isset($_GET['img']);
+	if (isset($_GET['img'])){$img=true;}else{$img=false;}
 	if (isset($_GET['start'])){$start=$_GET['start'];}else{$start='';}
-	if (isset($_GET['q'])){
-		$q_raw=$_GET['q'];
-		if (!$q_txt=htmlentities($_GET['q'], ENT_QUOTES, 'UTF-8')){$q_txt=$_GET['q'];} 
-		$title='Googol '.msg('search ').$q_txt;
-	}else{
-		$q_txt=$q_raw='';$title=msg('Googol - google without lies');
-	}
-
+	if (isset($_GET['q'])){$q=urldecode($_GET['q']);$title='Googol '.msg('search ').$q;}else{$q='';$title=msg('Googol - google without lies');}
 ?>
 
 <!DOCTYPE html>
 <html dir="ltr" lang="fr">
 <head>
-	<title><?php echo $title;?> </title>
-	
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title><?php echo htmlentities($title, ENT_QUOTES, 'UTF-8'); ?> </title>
 	<?php if (is_file('favicon.png')){echo '<link rel="shortcut icon" href="favicon.png" /> ';}?>
 	<link rel="stylesheet" type="text/css" href="<?php echo THEME;?>"  media="screen" />
 	<link rel="search" type="application/opensearchdescription+xml" title="<?php echo msg('Googol - google without lies'); ?>" href="<?php echo RACINE;?>/googol.xml">
 	<!--[if IE]><script> document.createElement("article");document.createElement("aside");document.createElement("section");document.createElement("footer");</script> <![endif]-->
 </head>
-<body class="<?php if ($img){echo 'images';}else{echo 'web';}?>">
+<body>
 <header>
-	<p class="top"><span class="version"> <?php echo htmlentities(VERSION, ENT_QUOTES, 'UTF-8'); ?></span><a class="<?php is_active(LANGUAGE,'fr'); ?>" href="?lang=fr">FR</a> <a class="<?php is_active(LANGUAGE,'en'); ?>" href="?lang=en">EN</a></p>
-	
+	<p class="langue"><a class="<?php is_active(LANGUAGE,'fr'); ?>" href="?lang=fr">FR</a> <a class="<?php is_active(LANGUAGE,'en'); ?>" href="?lang=en">EN</a></p>
+	<?php echo LOGO1.LOGO2; ?>
+	<p class="mini"><?php echo htmlentities(VERSION, ENT_QUOTES, 'UTF-8'); ?></p><p class="msg"><?php echo msg('Search anonymously on Google (direct links, fake referer)'); if ($img){echo '<br/>'.msg('The thumbnails are temporarly stored in this server to hide your ip from Google...');}  ?> </p>
 	<form action="" method="get" >
 		<input type="hidden" name="lang" value="<?php echo LANGUAGE;?>"/>
-	<span class="logo"><?php echo LOGO1.LOGO2; ?></span><span><input type="text" name="q" placeholder="<?php echo msg('Search'); ?>" value="<?php  echo $q_txt; ?>"/><input type="submit" value="OK"/></span>
+	<input type="text" name="q" placeholder="<?php echo msg('Search'); ?>" value="<?php echo htmlentities($q, ENT_QUOTES, 'UTF-8'); ?>"/><input type="submit" value="OK"/>
 	<?php if ($img){echo '<input type="hidden" name="img"/>';}?>
 	</form>
-	<p class="msg"><?php echo msg('Search anonymously on Google (direct links, fake referer)'); if ($img){echo '<br/>'.msg('The thumbnails are temporarly stored in this server to hide your ip from Google...');}  ?> </p>
-	
+
 </header>
 <nav>
 <?php 
-	if (!$img){echo '<li class="active">Web</li><li><a href="?q='.urlencode($q_raw).'&img&lang='.$langue.'">Images</a></li>';}
-	else{echo '<li><a href="?q='.urlencode($q_raw).'&lang='.$langue.'">Web</a></li><li class="active">Images</li>';}
+	if (!$img){echo '<li class="active">Web</li><li><a href="?q='.htmlentities($q, ENT_QUOTES, 'UTF-8').'&img">Images</a></li>';}
+	else{echo '<li><a href="?q='.htmlentities($q, ENT_QUOTES, 'UTF-8').'">Web</a></li><li class="active">Images</li>';}
 ?>
 </nav>
 <aside>
-	<?php if ($q_raw!=''){render_query(parse_query($q_raw,$start,$img));} ?>
+	<?php if ($q!=''){render_query(parse_query($q,$start,$img));} ?>
 </aside>
-<footer>
-	<a href="<?php echo RACINE;?>">Googol</a> <?php echo msg('by');?> 
-	<a href="http://warriordudimanche.net">Bronco - warriordudimanche.net</a> 
-	<a href="#" title="<?php echo msg('Free and open source (please keep a link to warriordudimanche.net for the author ^^)');?>"><em>Licence</em></a>  
-	<a href="https://github.com/broncowdd/googol" title="<?php echo msg('on GitHub');?>" class="github wot-exclude "> </a> <a href="http://flattr.com/thing/1319925/broncowddSnippetVamp-on-GitHub" target="_blank"><img src="http://images.warriordudimanche.net/flattr.png" alt="Flattr this" title="Flattr this" border="0" /></a>
-	<a href="http://duckduckgo.com" title="<?php echo msg('Otherwise, use a real Search engine !');?>" class="ddg wot-exclude "> </a>
-</footer>
+<footer><a href="<?php echo RACINE;?>">Googol</a> <?php echo msg('by');?> <a href="http://warriordudimanche.net">Bronco - warriordudimanche.net</a> <a href="#" title="<?php echo msg('Free and open source (please keep a link to warriordudimanche.net for the author ^^)');?>"><em>Licence</em></a>  <a href="https://github.com/broncowdd/googol" title="<?php echo msg('on GitHub');?>"><img width="32" src="github.png" alt="logoGH"/></a> <a href="http://flattr.com/thing/1319925/broncowddSnippetVamp-on-GitHub" target="_blank"><img src="http://images.warriordudimanche.net/flattr.png" alt="Flattr this" title="Flattr this" border="0" /></a><a href="http://duckduckgo.com" title="<?php echo msg('Otherwise, use a real Search engine !');?>"><img src="ddg.png" alt="ddg icon"/></a></footer>
 <?php if(USE_WEB_OF_TRUST){echo '<script type="text/javascript" src="http://api.mywot.com/widgets/ratings.js"></script>';}?> 
 </body>
 </html>
