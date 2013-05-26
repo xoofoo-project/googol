@@ -19,12 +19,12 @@
 		header span.logo{margin-left:10px;}
 
 		header .msg{font-size:16px;color:#444;font-style:italic;text-shadow:0 1px 1px #FFF;padding:0 10px;}
-		header .top{margin:0;margin-bottom:10px;padding:5px;padding-right:20px;text-align:right;font-weight: bold;color:#aaa;background-color:#2D2D2D;border-bottom:1px solid black;}
+		header .top{margin:0;margin-bottom:30px;padding:5px;padding-right:20px;text-align:right;font-weight: bold;color:#aaa;background-color:#2D2D2D;border-bottom:1px solid black;}
 		header .top a:hover{color:#aaa;}
 		header .top a{color:#666;}
 		header .top a.active{color:white;font-weight: bold;}
 		header .top .version{float:left;font-size:14px;}
-		nav{padding-left:35px;background-color:white;border-bottom:1px solid #ccc;}
+		nav{padding-left:35px;background-color:white;border-bottom:1px solid #ccc;margin-bottom:40px;}
 		nav li{border-bottom:4px solid transparent;background-color:white; display:inline-block;list-style:none;width:100px;height:30px;font-size:18px;text-align: center;padding-top:4px;}
 		nav li.active{color:red;font-weight: bold;border-bottom:4px solid red;}
 		nav li a{color:#666;}

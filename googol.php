@@ -11,7 +11,7 @@
 	define('LOGO2','<em class="o2">o</em><em class="g">g</em><em class="o1">o</em><em class="l">l</em>');
 	define('URL','https://www.google.fr/search?q=');
 	define('URLIMG','&tbm=isch&biw=1920&bih=1075&sei=v5ecUb6OG-2l0wW554GYBQ');
-	define('VERSION','v1.2');
+	define('VERSION','v1.2b');
 	define('LANGUAGE',$langue);
 	define('RACINE','http://'.$_SERVER['SERVER_NAME']);
 	define('USE_WEB_OF_TRUST',true);
@@ -136,7 +136,7 @@
 
 	function render_query($array){
 		global $start,$langue;
-		if (!is_array($array)||count($array)==0){return false;}
+		if (!is_array($array)||count($array)==0){echo '<div class="noresult"> '.msg('no results').' </div>';return false;}
 		if (!isset($array['sz'][0])){
 			foreach ($array['links'] as $nb => $link){
 				$r=str_replace('#link',$link,TPL);
@@ -170,19 +170,15 @@
 
 		if($array['nb_pages'] != 0){
 			echo '<hr/><p class="footerlogo">'.LOGO1.str_repeat('<em class="o2">o</em>', $array['nb_pages']-1).LOGO2.'</p><div class="pagination">';
+			if ($start>0){echo '<a class="previous" title="'.msg('previous').'" href="?q='.urlencode($array['query']).$img.'&start='.($start-10).'&lang='.$langue.'">&#9668;</a>';}
+			for ($i=0;$i<$array['nb_pages']-1;$i++){
+				if ($i*10==$array['current_page']){echo '<em>'.($i+1).'</em>';}
+				else{echo '<a href="?q='.urlencode($array['query']).$img.'&start='.$i.'0&lang='.$langue.'">'.($i+1).'</a>';}
+			}
+			if ($start<($array['nb_pages']-2)*10){echo '<a class="next" title="'.msg('next').'" href="?q='.urlencode($array['query']).$img.'&start='.($start+10).'&lang='.$langue.'">&#9658;</a>';}
+			
+			echo  '</div>';
 		}
-		else{
-			echo '<div class="noresult"> '.msg('no results').' </div>';
-		}
-
-		if ($start>0){echo '<a class="previous" title="'.msg('previous').'" href="?q='.urlencode($array['query']).$img.'&start='.($start-10).'&lang='.$langue.'">&#9668;</a>';}
-		for ($i=0;$i<$array['nb_pages']-1;$i++){
-			if ($i*10==$array['current_page']){echo '<em>'.($i+1).'</em>';}
-			else{echo '<a href="?q='.urlencode($array['query']).$img.'&start='.$i.'0&lang='.$langue.'">'.($i+1).'</a>';}
-		}
-		if ($start<($array['nb_pages']-2)*10){echo '<a class="next" title="'.msg('next').'" href="?q='.urlencode($array['query']).$img.'&start='.($start+10).'&lang='.$langue.'">&#9658;</a>';}
-		
-		echo  '</div>';
 	}
 	function grab_google_thumb($link){
 		if ($thumb=file_curl_contents($link)){
@@ -198,15 +194,22 @@
 
 
 	// Gestion GET
-	if (isset($_GET['img'])){$img=true;}else{$img=false;}
+	$img=isset($_GET['img']);
 	if (isset($_GET['start'])){$start=$_GET['start'];}else{$start='';}
-	if (isset($_GET['q'])){$q=urldecode($_GET['q']);$title='Googol '.msg('search ').$q;}else{$q='';$title=msg('Googol - google without lies');}
+	if (isset($_GET['q'])){
+		$q_raw=$_GET['q'];
+		if (!$q_txt=htmlentities($_GET['q'], ENT_QUOTES, 'UTF-8')){$q_txt=$_GET['q'];} 
+		$title='Googol '.msg('search ').$q_txt;
+	}else{
+		$q_txt=$q_raw='';$title=msg('Googol - google without lies');
+	}
+
 ?>
 
 <!DOCTYPE html>
 <html dir="ltr" lang="fr">
 <head>
-	<title><?php echo htmlentities($title, ENT_QUOTES, 'UTF-8'); ?> </title>
+	<title><?php echo $title;?> </title>
 	
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<?php if (is_file('favicon.png')){echo '<link rel="shortcut icon" href="favicon.png" /> ';}?>
@@ -220,20 +223,20 @@
 	
 	<form action="" method="get" >
 		<input type="hidden" name="lang" value="<?php echo LANGUAGE;?>"/>
-	<span class="logo"><?php echo LOGO1.LOGO2; ?></span><span><input type="text" name="q" placeholder="<?php echo msg('Search'); ?>" value="<?php echo htmlentities($q, ENT_QUOTES, 'UTF-8'); ?>"/><input type="submit" value="OK"/></span>
+	<span class="logo"><?php echo LOGO1.LOGO2; ?></span><span><input type="text" name="q" placeholder="<?php echo msg('Search'); ?>" value="<?php  echo $q_txt; ?>"/><input type="submit" value="OK"/></span>
 	<?php if ($img){echo '<input type="hidden" name="img"/>';}?>
 	</form>
-<p class="msg"><?php echo msg('Search anonymously on Google (direct links, fake referer)'); if ($img){echo '<br/>'.msg('The thumbnails are temporarly stored in this server to hide your ip from Google...');}  ?> </p>
+	<p class="msg"><?php echo msg('Search anonymously on Google (direct links, fake referer)'); if ($img){echo '<br/>'.msg('The thumbnails are temporarly stored in this server to hide your ip from Google...');}  ?> </p>
 	
 </header>
 <nav>
 <?php 
-	if (!$img){echo '<li class="active">Web</li><li><a href="?q='.htmlentities($q, ENT_QUOTES, 'UTF-8').'&img&lang='.$langue.'">Images</a></li>';}
-	else{echo '<li><a href="?q='.htmlentities($q, ENT_QUOTES, 'UTF-8').'&lang='.$langue.'">Web</a></li><li class="active">Images</li>';}
+	if (!$img){echo '<li class="active">Web</li><li><a href="?q='.urlencode($q_raw).'&img&lang='.$langue.'">Images</a></li>';}
+	else{echo '<li><a href="?q='.urlencode($q_raw).'&lang='.$langue.'">Web</a></li><li class="active">Images</li>';}
 ?>
 </nav>
 <aside>
-	<?php if ($q!=''){render_query(parse_query($q,$start,$img));} ?>
+	<?php if ($q_raw!=''){render_query(parse_query($q_raw,$start,$img));} ?>
 </aside>
 <footer><a href="<?php echo RACINE;?>">Googol</a> <?php echo msg('by');?> <a href="http://warriordudimanche.net">Bronco - warriordudimanche.net</a> <a href="#" title="<?php echo msg('Free and open source (please keep a link to warriordudimanche.net for the author ^^)');?>"><em>Licence</em></a>  <a href="https://github.com/broncowdd/googol" title="<?php echo msg('on GitHub');?>"><img width="32" src="github.png" alt="logoGH"/></a> <a href="http://flattr.com/thing/1319925/broncowddSnippetVamp-on-GitHub" target="_blank"><img src="http://images.warriordudimanche.net/flattr.png" alt="Flattr this" title="Flattr this" border="0" /></a><a href="http://duckduckgo.com" title="<?php echo msg('Otherwise, use a real Search engine !');?>"><img src="ddg.png" alt="ddg icon"/></a></footer>
 <?php if(USE_WEB_OF_TRUST){echo '<script type="text/javascript" src="http://api.mywot.com/widgets/ratings.js"></script>';}?> 
