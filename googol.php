@@ -1,6 +1,7 @@
 <?php
 	if (isset($_GET['lang'])){$langue=$_GET['lang'];}else{$langue=lang();}
 	clear_cache();// vire les thumbs de plus de trois minutes
+	define('LANGUAGE',$langue);
 	define('RACINE','http://'.$_SERVER['SERVER_NAME']);
 	define('USE_WEB_OF_TRUST',true);
 	define('WOT_URL','http://www.mywot.com/scorecard/');
@@ -8,14 +9,19 @@
 	define('REGEX_PAGES','#&start=([0-9]+)|&amp;start=([0-9]+)#');
 	define('REGEX_IMG','#(?<=imgurl=)(.*?)&amp;imgrefurl=(.*?)&amp;.*?h=([0-9]+)&amp;w=([0-9]+)&amp;sz=([0-9]+)|(?<=imgurl=)(.*?)&imgrefurl=(.*?)&.*?h=([0-9]+)&w=([0-9]+)&sz=([0-9]+)#');
 	define('REGEX_THMBS','#<img.*?height="([0-9]+)".*?width="([0-9]+)".*?src="([^"]+)"#');
+
+	define('REGEX_VID','#<h3 class="r">[^<]*<a href="/url\?q=(.*?)(?:&amp;|&).*?">(.*?)</a>.*?<cite[^>]*>([^<]+)</cite>.*?<span class="f">(.*?)</span></td>#');
+	define('REGEX_VID_THMBS','#<img.*?src="([^"]+)".*?width="([0-9]+)"#');
+
 	define('TPL','<div class="result"><a href="#link"><h3 class="title">#title</h3>#link</a>#wot<p class="description">#description</p></div>');
 	define('TPLIMG','<div class="image" ><p><a href="#link" title="#link">#thumbs</a></p><p class="description">#W x #H (#SZ ko)<a class="source" href="#site" title="#site"> &#9658;</a></p></div>');
+	define('TPLVID','<div class="video" ><h3><a href="#link" title="#link">#titre</a></h3><a class="thumb" href="#link" title="#link">#thumbs</a><p class="site">#site</p><p class="description">#description</p></div>');
 	define('LOGO1','<a href="'.RACINE.'"><em class="g">G</em><em class="o1">o</em>');
 	define('LOGO2','<em class="o2">o</em><em class="g">g</em><em class="o1">o</em><em class="l">l</em></a>');
-	define('URLIMG','&tbm=isch&biw=1920&bih=1075&sei=v5ecUb6OG-2l0wW554GYBQ');
-	define('VERSION','v1.2b');
-	define('LANGUAGE',$langue);
 	define('URL','https://www.google.com/search?hl='.LANGUAGE.'&q=');
+	define('URLIMG','&tbm=isch&biw=1920&bih=1075&sei=v5ecUb6OG-2l0wW554GYBQ');
+	define('URLVID','&tbm=vid');
+	define('VERSION','v1.3');
 	define('USE_GOOGLE_THUMBS',false);
 	define('THEME','style_google.css');
 	
@@ -36,6 +42,7 @@
 		'no results for'=>htmlentities('pas de résultat pour ', ENT_QUOTES, 'UTF-8'),
 		'by'=>'par',
 		'search '=>'recherche ',
+		'Videos'=>htmlentities('Vidéos', ENT_QUOTES, 'UTF-8'),
 		'Search'=>'Rechercher',
 		'Otherwise, use a real Search engine !'=>'Sinon, utilisez un vrai moteur de recherche !',
 		);
@@ -97,8 +104,9 @@
 			</OpenSearchDescription>');
 		}
 	}
-	function parse_query($query,$start=0,$img=false){
-		if (!$img){ // web
+	function parse_query($query,$start=0){
+		global $mode;
+		if ($mode==''){ 
 			$page=file_curl_contents(URL.str_replace(' ','+',urlencode($query)).'&start='.$start);
 			if (!$page){return false;}
 			preg_match_all(REGEX_WEB, $page, $r);
@@ -110,10 +118,11 @@
 				'descriptions'=>$r[3],
 				'nb_pages'=>$p,
 				'current_page'=>$start,
-				'query'=>$query
+				'query'=>$query,
+				'mode'=>$mode
 				);
 			return $retour;
-		}else{ //images
+		}elseif ($mode=='images'){ 
 			$page=file_curl_contents(URL.str_replace(' ','+',urlencode($query)).URLIMG.'&start='.$start);			
 			if (!$page){return false;}
 			preg_match_all(REGEX_IMG,$page,$r);
@@ -131,16 +140,37 @@
 				'thumbs_h'=>$t[1],
 				'nb_pages'=>$p,
 				'current_page'=>$start,
-				'query'=>$query
+				'query'=>$query,
+				'mode'=>$mode
 				);			
+			return $retour;		
+		}elseif($mode=="videos"){
+			$page=file_curl_contents(URL.str_replace(' ','+',urlencode($query)).URLVID.'&start='.$start);		
+			if (!$page){return false;}
+			preg_match_all(REGEX_VID,$page,$r);
+			preg_match_all(REGEX_PAGES,$page,$p);
+			preg_match_all(REGEX_VID_THMBS,$page,$t);
+			$p=count($p[2]);
+						$retour=array(
+				'site'=>$r[3],
+				'titre'=>$r[2],
+				'links'=>$r[1],
+				'description'=>$r[4],
+				'thumbs'=>$t[1],
+				'thumbs_w'=>$t[2],
+				'nb_pages'=>$p,
+				'current_page'=>$start,
+				'query'=>$query,
+				'mode'=>$mode
+				);
 			return $retour;		
 		}
 	}
 
 	function render_query($array){
-		global $start,$langue;
+		global $start,$langue,$mode;
 		if (!is_array($array)||count($array['links'])==0){echo '<div class="noresult"> '.msg('no results for').' <em>'.$array['query'].'</em> </div>';return false;}
-		if (!isset($array['sz'][0])){
+		if ($mode==''){
 			foreach ($array['links'] as $nb => $link){
 				$r=str_replace('#link',urldecode($link),TPL);
 				$r=str_replace('#title',$array['titles'][$nb],$r);
@@ -154,8 +184,7 @@
 
 				echo $r;
 			}
-			$img='';
-		}else{
+		}elseif ($mode=='images'){
 			foreach ($array['links'] as $nb => $link){
 				$r=str_replace('#link',$link,TPLIMG);
 				$r=str_replace('#SZ',$array['sz'][$nb],$r);
@@ -168,22 +197,33 @@
 					$repl='<img src="'.$array['thumbs'][$nb].'" width="'.$array['thumbs_w'][$nb].'" height="'.$array['thumbs_h'][$nb].'"/>';
 				}				
 				$r=str_replace('#thumbs',$repl,$r);
-				$r=str_replace('#thumbs_h',$array['thumbs_h'][$nb],$r);
-				$r=str_replace('#thumbs_w',$array['thumbs_w'][$nb],$r);
 				echo $r;
 			}	
-			$img='&img';
+		}elseif($mode='videos'){
+			foreach ($array['links'] as $nb => $link){
+				$r=str_replace('#link',$link,TPLVID);
+				$r=str_replace('#titre',$array['titre'][$nb],$r);
+				$r=str_replace('#description',$array['description'][$nb],$r);
+				$r=str_replace('#site',htmlentities($array['site'][$nb]),$r);
+				if (!USE_GOOGLE_THUMBS){
+					$repl='<img src="'.grab_google_thumb($array['thumbs'][$nb]).'" width="'.$array['thumbs_w'][$nb].'" height="'.round($array['thumbs_w'][$nb]/1.33).'"/>';
+				}else if (USE_GOOGLE_THUMBS){
+					$repl='<img src="'.$array['thumbs'][$nb].'" width="'.$array['thumbs_w'][$nb].'" height="'.round($array['thumbs_w'][$nb]/1.33).'"/>';
+				}				
+				$r=str_replace('#thumbs',$repl,$r);
+				echo $r;
+			}
 
 		}
 
 		if($array['nb_pages'] != 0){
 			echo '<hr/><p class="footerlogo">'.LOGO1.str_repeat('<em class="o2">o</em>', $array['nb_pages']-1).LOGO2.'</p><div class="pagination">';
-			if ($start>0){echo '<a class="previous" title="'.msg('previous').'" href="?q='.urlencode($array['query']).$img.'&start='.($start-10).'&lang='.$langue.'">&#9668;</a>';}
+			if ($start>0){echo '<a class="previous" title="'.msg('previous').'" href="?q='.urlencode($array['query']).'&mod='.$mode.'&start='.($start-10).'&lang='.$langue.'">&#9668;</a>';}
 			for ($i=0;$i<$array['nb_pages']-1;$i++){
 				if ($i*10==$array['current_page']){echo '<em>'.($i+1).'</em>';}
-				else{echo '<a href="?q='.urlencode($array['query']).$img.'&start='.$i.'0&lang='.$langue.'">'.($i+1).'</a>';}
+				else{echo '<a href="?q='.urlencode($array['query']).'&mod='.$mode.'&start='.$i.'0&lang='.$langue.'">'.($i+1).'</a>';}
 			}
-			if ($start<($array['nb_pages']-2)*10){echo '<a class="next" title="'.msg('next').'" href="?q='.urlencode($array['query']).$img.'&start='.($start+10).'&lang='.$langue.'">&#9658;</a>';}
+			if ($start<($array['nb_pages']-2)*10){echo '<a class="next" title="'.msg('next').'" href="?q='.urlencode($array['query']).'&mod='.$mode.'&start='.($start+10).'&lang='.$langue.'">&#9658;</a>';}
 			
 			echo  '</div>';
 		}
@@ -202,7 +242,7 @@
 
 
 	// Gestion GET
-	$img=isset($_GET['img']);
+	if (isset($_GET['mod'])){$mode=$_GET['mod'];}else{$mode='';}
 	if (isset($_GET['start'])){$start=$_GET['start'];}else{$start='';}
 	if (isset($_GET['q'])){
 		$q_raw=$_GET['q'];
@@ -225,26 +265,32 @@
 	<link rel="search" type="application/opensearchdescription+xml" title="<?php echo msg('Googol - google without lies'); ?>" href="<?php echo RACINE;?>/googol.xml">
 	<!--[if IE]><script> document.createElement("article");document.createElement("aside");document.createElement("section");document.createElement("footer");</script> <![endif]-->
 </head>
-<body class="<?php if ($img){echo 'images';}else{echo 'web';}?>">
+<body class="<?php echo $mode;?>">
 <header>
 	<p class="top"><span class="version"> <?php echo htmlentities(VERSION, ENT_QUOTES, 'UTF-8'); ?></span><a class="<?php is_active(LANGUAGE,'fr'); ?>" href="?lang=fr">FR</a> <a class="<?php is_active(LANGUAGE,'en'); ?>" href="?lang=en">EN</a></p>
 	
 	<form action="" method="get" >
 		<input type="hidden" name="lang" value="<?php echo LANGUAGE;?>"/>
 	<span class="logo"><?php echo LOGO1.LOGO2; ?></span><span><input type="text" name="q" placeholder="<?php echo msg('Search'); ?>" value="<?php  echo $q_txt; ?>"/><input type="submit" value="OK"/></span>
-	<?php if ($img){echo '<input type="hidden" name="img"/>';}?>
+	<?php if ($mode=='images'){echo '<input type="hidden" name="img"/>';}?>
 	</form>
-	<p class="msg"><?php echo msg('Search anonymously on Google (direct links, fake referer)'); if ($img){echo '<br/>'.msg('The thumbnails are temporarly stored in this server to hide your ip from Google...');}  ?> </p>
-	
+	<p class="msg">
+		<?php 
+			echo msg('Search anonymously on Google (direct links, fake referer)'); 
+			if ($mode!=''){	echo '<br/>'.msg('The thumbnails are temporarly stored in this server to hide your ip from Google...');	} 
+		?> 
+	</p>
+		
 </header>
 <nav>
 <?php 
-	if (!$img){echo '<li class="active">Web</li><li><a href="?q='.urlencode($q_raw).'&img&lang='.$langue.'">Images</a></li>';}
-	else{echo '<li><a href="?q='.urlencode($q_raw).'&lang='.$langue.'">Web</a></li><li class="active">Images</li>';}
-?>
+	if ($mode==''){echo '<li class="active">Web</li><li><a href="?q='.urlencode($q_raw).'&mod=images&lang='.$langue.'">Images</a></li><li><a href="?q='.urlencode($q_raw).'&mod=videos&lang='.$langue.'">'.msg('Videos').'</a></li>';}
+	else if($mode=='images'){echo '<li><a href="?q='.urlencode($q_raw).'&lang='.$langue.'">Web</a></li><li class="active">Images</li><li><a href="?q='.urlencode($q_raw).'&mod=videos&lang='.$langue.'">'.msg('Videos').'</a></li>';}
+	else { echo '<li><a href="?q='.urlencode($q_raw).'&lang='.$langue.'">Web</a></li><li><a href="?q='.urlencode($q_raw).'&mod=images&lang='.$langue.'">Images</a></li><li class="active">'.msg('Videos').'</li>';}
+?>	
 </nav>
 <aside>
-	<?php if ($q_raw!=''){render_query(parse_query($q_raw,$start,$img));} ?>
+	<?php if ($q_raw!=''){render_query(parse_query($q_raw,$start,$mode));} ?>
 </aside>
 <footer>
 	<a href="<?php echo RACINE;?>">Googol</a> <?php echo msg('by');?> 
