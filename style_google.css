@@ -50,7 +50,7 @@
 		.image img:hover{border:1px solid #333;}
 
 		/*video results*/
-		.video{display:inline-block;width:32%;min-width:250px;padding:5px; margin:5px;text-align: left;border-radius:3px;}
+		.video{display:inline-block;width:32%;min-width:250px;padding:5px; margin:5px;text-align: left;border-radius:3px;word-wrap:break-word;overflow-wrap: break-word;-webkit-hyphens:auto;-moz-hyphens:auto;-ms-hyphens:auto;}
 		.video p{margin:0;padding: 0;}
 		.video .description{font-size: 12px;}
 		.video img{border:1px solid transparent;border-radius: 4px; box-shadow: 0 1px 2px #555}

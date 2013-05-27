@@ -32,17 +32,17 @@
 		if (!is_dir('thumbs')){mkdir('thumbs');}// crée le dossier thumbs si nécessaire
 	}
 	$lang['fr']=array(
-		'previous'=>htmlentities('Page précédente', ENT_QUOTES, 'UTF-8'),
+		'previous'=>myhtmlentities('Page précédente'),
 		'next'=>'Page suivante',
-		'The thumbnails are temporarly stored in this server to hide your ip from Google...'=>htmlentities('les miniatures sont temporairement récupérées sur ce serveur, google n\'a pas votre IP...', ENT_QUOTES, 'UTF-8'),
-		'Search anonymously on Google (direct links, fake referer)'=>htmlentities('Rechercher anonymement sur Google (liens directs et referrer caché)', ENT_QUOTES, 'UTF-8'),
-		'Free and open source (please keep a link to warriordudimanche.net for the author ^^)'=>htmlentities('Libre et open source, merci de laisser un lien vers warriordudimanche.net pour citer l\'auteur ;)', ENT_QUOTES, 'UTF-8'),
+		'The thumbnails are temporarly stored in this server to hide your ip from Google...'=>myhtmlentities('les miniatures sont temporairement récupérées sur ce serveur, google n\'a pas votre IP...'),
+		'Search anonymously on Google (direct links, fake referer)'=>myhtmlentities('Rechercher anonymement sur Google (liens directs et referrer caché)'),
+		'Free and open source (please keep a link to warriordudimanche.net for the author ^^)'=>myhtmlentities('Libre et open source, merci de laisser un lien vers warriordudimanche.net pour citer l\'auteur ;)'),
 		'Googol - google without lies'=>'Googol - google sans mensonge',
 		'on GitHub'=>'sur GitHub',
-		'no results for'=>htmlentities('pas de résultat pour ', ENT_QUOTES, 'UTF-8'),
+		'no results for'=>myhtmlentities('pas de résultat pour '),
 		'by'=>'par',
 		'search '=>'recherche ',
-		'Videos'=>htmlentities('Vidéos', ENT_QUOTES, 'UTF-8'),
+		'Videos'=>myhtmlentities('Vidéos'),
 		'Search'=>'Rechercher',
 		'Otherwise, use a real Search engine !'=>'Sinon, utilisez un vrai moteur de recherche !',
 		);
@@ -239,14 +239,14 @@
 	}
 	function clear_cache($delay=180){$fs=glob('thumbs/*'); if(!empty($fs)){foreach ($fs as $file){if (@date('U')-@date(filemtime($file))>$delay){unlink ($file);}}}}
 	function is_active($first,$second){if ($first==$second){echo 'active';}else{echo '';}}
-
+ 	function myhtmlentities($string){	$temp=htmlentities($string, ENT_QUOTES, 'UTF-8');if ($temp==''){return $string;}else{return $temp;}}
 
 	// Gestion GET
 	if (isset($_GET['mod'])){$mode=$_GET['mod'];}else{$mode='';}
 	if (isset($_GET['start'])){$start=$_GET['start'];}else{$start='';}
 	if (isset($_GET['q'])){
 		$q_raw=$_GET['q'];
-		if (!$q_txt=htmlentities($_GET['q'], ENT_QUOTES, 'UTF-8')){$q_txt=$_GET['q'];} 
+		if (!$q_txt=myhtmlentities($_GET['q'])){$q_txt=$_GET['q'];} 
 		$title='Googol '.msg('search ').$q_txt;
 	}else{
 		$q_txt=$q_raw='';$title=msg('Googol - google without lies');
@@ -267,12 +267,12 @@
 </head>
 <body class="<?php echo $mode;?>">
 <header>
-	<p class="top"><span class="version"> <?php echo htmlentities(VERSION, ENT_QUOTES, 'UTF-8'); ?></span><a class="<?php is_active(LANGUAGE,'fr'); ?>" href="?lang=fr">FR</a> <a class="<?php is_active(LANGUAGE,'en'); ?>" href="?lang=en">EN</a></p>
+	<p class="top"><span class="version"> <?php echo myhtmlentities(VERSION); ?></span><a class="<?php is_active(LANGUAGE,'fr'); ?>" href="?lang=fr">FR</a> <a class="<?php is_active(LANGUAGE,'en'); ?>" href="?lang=en">EN</a></p>
 	
 	<form action="" method="get" >
 		<input type="hidden" name="lang" value="<?php echo LANGUAGE;?>"/>
 	<span class="logo"><?php echo LOGO1.LOGO2; ?></span><span><input type="text" name="q" placeholder="<?php echo msg('Search'); ?>" value="<?php  echo $q_txt; ?>"/><input type="submit" value="OK"/></span>
-	<?php if ($mode=='images'){echo '<input type="hidden" name="img"/>';}?>
+	<?php if ($mode!=''){echo '<input type="hidden" name="mod" value="'.$mode.'"/>';}?>
 	</form>
 	<p class="msg">
 		<?php 
