@@ -230,7 +230,7 @@
 	}
 	function grab_google_thumb($link){
 		if ($thumb=file_curl_contents($link)){
-			$local='thumbs/'.str_replace(array('?','/',':'),'',$link).'.jpg';
+			$local='thumbs/'.preg_replace('#[^a-zA-Z0-9-_.]#','',$link).'.jpg';
 			if (!is_file($local)){file_put_contents($local,$thumb);}
 			return $local;
 		}else{
