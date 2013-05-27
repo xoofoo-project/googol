@@ -106,7 +106,7 @@
 	}
 	function parse_query($query,$start=0){
 		global $mode;
-		if ($mode==''){ 
+		if ($mode=='web'){ 
 			$page=file_curl_contents(URL.str_replace(' ','+',urlencode($query)).'&start='.$start);
 			if (!$page){return false;}
 			preg_match_all(REGEX_WEB, $page, $r);
@@ -170,7 +170,7 @@
 	function render_query($array){
 		global $start,$langue,$mode;
 		if (!is_array($array)||count($array['links'])==0){echo '<div class="noresult"> '.msg('no results for').' <em>'.$array['query'].'</em> </div>';return false;}
-		if ($mode==''){
+		if ($mode=='web'){
 			foreach ($array['links'] as $nb => $link){
 				$r=str_replace('#link',urldecode($link),TPL);
 				$r=str_replace('#title',$array['titles'][$nb],$r);
@@ -242,7 +242,7 @@
  	function myhtmlentities($string){	$temp=htmlentities($string, ENT_QUOTES, 'UTF-8');if ($temp==''){return $string;}else{return $temp;}}
 
 	// Gestion GET
-	if (isset($_GET['mod'])){$mode=$_GET['mod'];}else{$mode='';}
+	if (isset($_GET['mod'])){$mode=$_GET['mod'];}else{$mode='web';}
 	if (isset($_GET['start'])){$start=$_GET['start'];}else{$start='';}
 	if (isset($_GET['q'])){
 		$q_raw=$_GET['q'];
@@ -284,7 +284,7 @@
 </header>
 <nav>
 <?php 
-	if ($mode==''){echo '<li class="active">Web</li><li><a href="?q='.urlencode($q_raw).'&mod=images&lang='.$langue.'">Images</a></li><li><a href="?q='.urlencode($q_raw).'&mod=videos&lang='.$langue.'">'.msg('Videos').'</a></li>';}
+	if ($mode=='web'){echo '<li class="active">Web</li><li><a href="?q='.urlencode($q_raw).'&mod=images&lang='.$langue.'">Images</a></li><li><a href="?q='.urlencode($q_raw).'&mod=videos&lang='.$langue.'">'.msg('Videos').'</a></li>';}
 	else if($mode=='images'){echo '<li><a href="?q='.urlencode($q_raw).'&lang='.$langue.'">Web</a></li><li class="active">Images</li><li><a href="?q='.urlencode($q_raw).'&mod=videos&lang='.$langue.'">'.msg('Videos').'</a></li>';}
 	else { echo '<li><a href="?q='.urlencode($q_raw).'&lang='.$langue.'">Web</a></li><li><a href="?q='.urlencode($q_raw).'&mod=images&lang='.$langue.'">Images</a></li><li class="active">'.msg('Videos').'</li>';}
 ?>	
