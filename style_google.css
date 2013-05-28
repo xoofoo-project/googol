@@ -35,7 +35,7 @@
 		input[type=submit]:hover{background-color:#397be6;border-color:#286ad5 }
 		input[type=submit]:active{background-color:#397be6;border-color:transparent;border-top:2px solid transparent;box-shadow:  0 0px 1px #397be6;}
 		/*Web results*/
-		.result{padding:0 10px ;margin:0;border-radius:3px;word-wrap:break-word;overflow-wrap: break-word;-webkit-hyphens:auto;-moz-hyphens:auto;-ms-hyphens:auto;}
+		.result{padding:5px 10px ;margin:0;border-radius:3px;word-wrap:break-word;overflow-wrap: break-word;-webkit-hyphens:auto;-moz-hyphens:auto;-ms-hyphens:auto;}
 		.result:hover,.image:hover, .video:hover{background-color:#ddd!important;}
 		.result:nth-child(odd),.image:nth-child(odd){background-color:#eee;}
 

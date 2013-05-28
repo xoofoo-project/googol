@@ -13,15 +13,15 @@
 	define('REGEX_VID','#<h3 class="r">[^<]*<a href="/url\?q=(.*?)(?:&amp;|&).*?">(.*?)</a>.*?<cite[^>]*>([^<]+)</cite>.*?<span class="f">(.*?)</span></td>#');
 	define('REGEX_VID_THMBS','#<img.*?src="([^"]+)".*?width="([0-9]+)"#');
 
-	define('TPL','<div class="result"><a href="#link"><h3 class="title">#title</h3>#link</a>#wot<p class="description">#description</p></div>');
-	define('TPLIMG','<div class="image" ><p><a href="#link" title="#link">#thumbs</a></p><p class="description">#W x #H (#SZ ko)<a class="source" href="#site" title="#site"> &#9658;</a></p></div>');
-	define('TPLVID','<div class="video" ><h3><a href="#link" title="#link">#titre</a></h3><a class="thumb" href="#link" title="#link">#thumbs</a><p class="site">#site</p><p class="description">#description</p></div>');
+	define('TPL','<div class="result"><a rel="noreferrer" href="#link"><h3 class="title">#title</h3>#link</a>#wot<p class="description">#description</p></div>');
+	define('TPLIMG','<div class="image" ><p><a rel="noreferrer" href="#link" title="#link">#thumbs</a></p><p class="description">#W x #H (#SZ ko)<a class="source" href="#site" title="#site"> &#9658;</a></p></div>');
+	define('TPLVID','<div class="video" ><h3><a rel="noreferrer" href="#link" title="#link">#titre</a></h3><a class="thumb" rel="noreferrer" href="#link" title="#link">#thumbs</a><p class="site">#site</p><p class="description">#description</p></div>');
 	define('LOGO1','<a href="'.RACINE.'"><em class="g">G</em><em class="o1">o</em>');
 	define('LOGO2','<em class="o2">o</em><em class="g">g</em><em class="o1">o</em><em class="l">l</em></a>');
 	define('URL','https://www.google.com/search?hl='.LANGUAGE.'&q=');
 	define('URLIMG','&tbm=isch&biw=1920&bih=1075&sei=v5ecUb6OG-2l0wW554GYBQ');
 	define('URLVID','&tbm=vid');
-	define('VERSION','v1.3');
+	define('VERSION','v1.3b');
 	define('USE_GOOGLE_THUMBS',false);
 	define('THEME','style_google.css');
 	
@@ -199,8 +199,9 @@
 				$r=str_replace('#thumbs',$repl,$r);
 				echo $r;
 			}	
-		}elseif($mode='videos'){
+		}elseif($mode='videos'){ 
 			foreach ($array['links'] as $nb => $link){
+				$array['description'][$nb]=link2YoutubeUser($array['description'][$nb],$link);
 				$r=str_replace('#link',$link,TPLVID);
 				$r=str_replace('#titre',$array['titre'][$nb],$r);
 				$r=str_replace('#description',$array['description'][$nb],$r);
@@ -236,6 +237,12 @@
 		}else{
 			return $link;
 		}
+	}
+	function link2YoutubeUser($desc,$link){
+		if (stristr($link,'youtube.com')){
+			$desc=preg_replace('#([Aa]jout[^ ]+ par )([^<]+)#','$1<a rel="noreferrer" href="http://www.youtube.com/user/$2?feature=watch">$2</a>',$desc);
+		};
+		return $desc;
 	}
 	function clear_cache($delay=180){$fs=glob('thumbs/*'); if(!empty($fs)){foreach ($fs as $file){if (@date('U')-@date(filemtime($file))>$delay){unlink ($file);}}}}
 	function is_active($first,$second){if ($first==$second){echo 'active';}else{echo '';}}
