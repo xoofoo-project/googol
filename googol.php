@@ -10,9 +10,10 @@
 	define('REGEX_IMG','#(?<=imgurl=)(.*?)&amp;imgrefurl=(.*?)&amp;.*?h=([0-9]+)&amp;w=([0-9]+)&amp;sz=([0-9]+)|(?<=imgurl=)(.*?)&imgrefurl=(.*?)&.*?h=([0-9]+)&w=([0-9]+)&sz=([0-9]+)#');
 	define('REGEX_THMBS','#<img.*?height="([0-9]+)".*?width="([0-9]+)".*?src="([^"]+)"#');
 
-	define('REGEX_VID','#<h3 class="r">[^<]*<a href="/url\?q=(.*?)(?:&amp;|&).*?">(.*?)</a>.*?<cite[^>]*>([^<]+)</cite>.*?<span class="f">(.*?)</span></td>#');
+	define('REGEX_VID','#(?:<img.*?src="([^"]+)".*?width="([0-9]+)".*?)?<h3 class="r">[^<]*<a href="/url\?q=(.*?)(?:&amp;|&).*?">(.*?)</a>.*?<cite[^>]*>(.*?)</cite>.*?<span class="(?:st|f)">(.*?)(?:</span></td>|</span><br></?div>)#');
+	//define('REGEX_VID','#<h3 class="r">[^<]*<a href="/url\?q=(.*?)(?:&amp;|&).*?">(.*?)</a>.*?<cite[^>]*>(.*?)</cite>.*?<span class="(?:st|f)">(.*?)(?:</span></td>|</span><br></?div>)#');
 	define('REGEX_VID_THMBS','#<img.*?src="([^"]+)".*?width="([0-9]+)"#');
-
+//<h3 class="r">[^<]*<a href="/url\?q=(.*?)(?:&amp;|&).*?">(.*?)</a>.*?<cite[^>]*>(.*?)</cite>.*?<span class="(?:st|f)">(.*?)(?:</span></td>|</span><br></?div>)
 	define('TPL','<div class="result"><a rel="noreferrer" href="#link"><h3 class="title">#title</h3>#link</a>#wot<p class="description">#description</p></div>');
 	define('TPLIMG','<div class="image" ><p><a rel="noreferrer" href="#link" title="#link">#thumbs</a></p><p class="description">#W x #H (#SZ ko)<a class="source" href="#site" title="#site"> &#9658;</a></p></div>');
 	define('TPLVID','<div class="video" ><h3><a rel="noreferrer" href="#link" title="#link">#titre</a></h3><a class="thumb" rel="noreferrer" href="#link" title="#link">#thumbs</a><p class="site">#site</p><p class="description">#description</p></div>');
@@ -21,7 +22,7 @@
 	define('URL','https://www.google.com/search?hl='.LANGUAGE.'&q=');
 	define('URLIMG','&tbm=isch&biw=1920&bih=1075&sei=v5ecUb6OG-2l0wW554GYBQ');
 	define('URLVID','&tbm=vid');
-	define('VERSION','v1.3b');
+	define('VERSION','v1.3c');
 	define('USE_GOOGLE_THUMBS',false);
 	define('THEME','style_google.css');
 	
@@ -145,19 +146,18 @@
 				);			
 			return $retour;		
 		}elseif($mode=="videos"){
-			$page=file_curl_contents(URL.str_replace(' ','+',urlencode($query)).URLVID.'&start='.$start);		
+			$page=file_curl_contents(URL.str_replace(' ','+',urlencode($query)).URLVID.'&start='.$start);
 			if (!$page){return false;}
 			preg_match_all(REGEX_VID,$page,$r);
 			preg_match_all(REGEX_PAGES,$page,$p);
-			preg_match_all(REGEX_VID_THMBS,$page,$t);
 			$p=count($p[2]);
-						$retour=array(
-				'site'=>$r[3],
-				'titre'=>$r[2],
-				'links'=>$r[1],
-				'description'=>$r[4],
-				'thumbs'=>$t[1],
-				'thumbs_w'=>$t[2],
+			$retour=array(
+				'site'=>$r[5],
+				'titre'=>$r[4],
+				'links'=>$r[3],
+				'description'=>$r[6],
+				'thumbs'=>$r[1],
+				'thumbs_w'=>$r[2],
 				'nb_pages'=>$p,
 				'current_page'=>$start,
 				'query'=>$query,
@@ -205,7 +205,7 @@
 				$r=str_replace('#link',$link,TPLVID);
 				$r=str_replace('#titre',$array['titre'][$nb],$r);
 				$r=str_replace('#description',$array['description'][$nb],$r);
-				$r=str_replace('#site',htmlentities($array['site'][$nb]),$r);
+				$r=str_replace('#site',$array['site'][$nb],$r);
 				if (!USE_GOOGLE_THUMBS){
 					$repl='<img src="'.grab_google_thumb($array['thumbs'][$nb]).'" width="'.$array['thumbs_w'][$nb].'" height="'.round($array['thumbs_w'][$nb]/1.33).'"/>';
 				}else if (USE_GOOGLE_THUMBS){

@@ -3,6 +3,8 @@
 		aside{padding:0 25px 100px;}
 		a {text-decoration: none; }
 		hr{border:none;border-top:1px solid #aaa;}
+		h3,.title{font-weight: normal;}
+		.title b{font-style: italic!important}
 		form{margin:0;padding:0;line-height:20px;}
 		header{text-align:left;width:auto;background-color:#ddd;padding:0;border-bottom:1px solid #ccc;}
 		header,footer{
@@ -58,7 +60,8 @@
 		.video img{border:1px solid transparent;border-radius: 4px; box-shadow: 0 1px 2px #555}
 		.video img:hover{border:1px solid #333;}
 		.video .thumb{display:block;float:left;margin-right:10px;}
-		.video .site{font-weight:bold;color:#0B0;}
+		.video .site{color:#0B0;}
+		.video .site b{font-style: italic;}
 		.video .description{font-size:16px;}		
 		.video span{font-size:14px;color:#888;font-style: italic}
 		
