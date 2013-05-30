@@ -20,7 +20,7 @@
 	define('LOGO1','<a href="'.RACINE.'"><em class="g">G</em><em class="o1">o</em>');
 	define('LOGO2','<em class="o2">o</em><em class="g">g</em><em class="o1">o</em><em class="l">l</em></a>');
 	define('URL','https://www.google.com/search?hl='.LANGUAGE.'&q=');
-	define('URLIMG','&tbm=isch&biw=1920&bih=1075&sei=v5ecUb6OG-2l0wW554GYBQ');
+	define('URLIMG','&tbm=isch&biw=1920&bih=1075');
 	define('URLVID','&tbm=vid');
 	define('VERSION','v1.3c');
 	define('USE_GOOGLE_THUMBS',false);
