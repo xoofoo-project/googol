@@ -11,21 +11,25 @@
 	define('REGEX_THMBS','#<img.*?height="([0-9]+)".*?width="([0-9]+)".*?src="([^"]+)"#');
 
 	define('REGEX_VID','#(?:<img.*?src="([^"]+)".*?width="([0-9]+)".*?)?<h3 class="r">[^<]*<a href="/url\?q=(.*?)(?:&amp;|&).*?">(.*?)</a>.*?<cite[^>]*>(.*?)</cite>.*?<span class="(?:st|f)">(.*?)(?:</span></td>|</span><br></?div>)#');
-	//define('REGEX_VID','#<h3 class="r">[^<]*<a href="/url\?q=(.*?)(?:&amp;|&).*?">(.*?)</a>.*?<cite[^>]*>(.*?)</cite>.*?<span class="(?:st|f)">(.*?)(?:</span></td>|</span><br></?div>)#');
 	define('REGEX_VID_THMBS','#<img.*?src="([^"]+)".*?width="([0-9]+)"#');
-//<h3 class="r">[^<]*<a href="/url\?q=(.*?)(?:&amp;|&).*?">(.*?)</a>.*?<cite[^>]*>(.*?)</cite>.*?<span class="(?:st|f)">(.*?)(?:</span></td>|</span><br></?div>)
 	define('TPL','<div class="result"><a rel="noreferrer" href="#link"><h3 class="title">#title</h3>#link</a>#wot<p class="description">#description</p></div>');
 	define('TPLIMG','<div class="image" ><p><a rel="noreferrer" href="#link" title="#link">#thumbs</a></p><p class="description">#W x #H (#SZ ko)<a class="source" href="#site" title="#site"> &#9658;</a></p></div>');
 	define('TPLVID','<div class="video" ><h3><a rel="noreferrer" href="#link" title="#link">#titre</a></h3><a class="thumb" rel="noreferrer" href="#link" title="#link">#thumbs</a><p class="site">#site</p><p class="description">#description</p></div>');
 	define('LOGO1','<a href="'.RACINE.'"><em class="g">G</em><em class="o1">o</em>');
 	define('LOGO2','<em class="o2">o</em><em class="g">g</em><em class="o1">o</em><em class="l">l</em></a>');
-	define('URL','https://www.google.com/search?hl='.LANGUAGE.'&q=');
+	
+	define('SAFESEARCH_ON','&safe=on');
+	define('SAFESEARCH_IMAGESONLY','&safe=images');
+	define('SAFESEARCH_OFF','&safe=off');
+	define('SAFESEARCH_LEVEL',SAFESEARCH_OFF);// SAFESEARCH_ON, SAFESEARCH_IMAGESONLY, SAFESEARCH_OFF
+
+	define('URL','https://www.google.com/search?hl='.LANGUAGE.SAFESEARCH_LEVEL.'&q=');
 	define('URLIMG','&tbm=isch&biw=1920&bih=1075');
 	define('URLVID','&tbm=vid');
 	define('VERSION','v1.3c');
 	define('USE_GOOGLE_THUMBS',false);
 	define('THEME','style_google.css');
-	
+
 	if (!USE_GOOGLE_THUMBS){ 
 		session_start();
 		if (!isset($_SESSION['ID'])){$_SESSION['ID']=uniqid();}
