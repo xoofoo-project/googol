@@ -83,7 +83,10 @@
 		a.wot{background-position: 0 -163px; width: 32px; height: 15px;}
 		.ddg{ background-position: 0 0; width: 32px; height: 31px; } 
 		.github{ background-position: 0 -81px; width: 39px; height: 32px; } 
-		
+		.ss_off,.ss_on,.ss_images{font-size:14px;}
+		.ss_off{color:red;font-weight: bold;}
+		.ss_on{color:lightgreen;font-weight: normal;}
+		.ss_images{color:yellow;font-weight: bold;}
 
 
 		@media screen and (max-width: 1100px){

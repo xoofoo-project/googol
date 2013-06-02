@@ -26,7 +26,7 @@
 	define('URL','https://www.google.com/search?hl='.LANGUAGE.SAFESEARCH_LEVEL.'&q=');
 	define('URLIMG','&tbm=isch&biw=1920&bih=1075');
 	define('URLVID','&tbm=vid');
-	define('VERSION','v1.3c');
+	define('VERSION','v1.3d');
 	define('USE_GOOGLE_THUMBS',false);
 	define('THEME','style_google.css');
 
@@ -50,6 +50,9 @@
 		'Videos'=>myhtmlentities('Vidéos'),
 		'Search'=>'Rechercher',
 		'Otherwise, use a real Search engine !'=>'Sinon, utilisez un vrai moteur de recherche !',
+		'Filter on'=>myhtmlentities('Filtre activé'),
+		'Filter off'=>myhtmlentities('Filtre désactivé'),
+		'Filter images only'=>myhtmlentities('Filtre activé sur les images'),
 		);
 
 
@@ -57,6 +60,11 @@
 	function aff($a,$stop=true){echo 'Arret a la ligne '.__LINE__.' du fichier '.__FILE__.'<pre>';var_dump($a);echo '</pre>';if ($stop){exit();}}
 	function msg($m){global $lang;if(isset($lang[LANGUAGE][$m])){return $lang[LANGUAGE][$m];}else{return $m;}}
 	function lang($default='fr'){if (isset($_SERVER['HTTP_ACCEPT_LANGUAGE'])){$l=explode(',',$_SERVER['HTTP_ACCEPT_LANGUAGE']);return substr($l[0],0,2);}else{return $default;}}
+	function return_safe_search_level(){
+		if (SAFESEARCH_LEVEL==SAFESEARCH_ON){return '<b class="ss_on">'.msg('Filter on').'</b>';}
+		if (SAFESEARCH_LEVEL==SAFESEARCH_OFF){return '<b class="ss_off">'.msg('Filter off').'</b>';}
+		if (SAFESEARCH_LEVEL==SAFESEARCH_IMAGESONLY){return '<b class="ss_images">'.msg('Filter images only').'</b>';}
+	}
 	function Random_referer(){
 		$rr=array(
 			'http://oudanstoncul.com.free.fr/‎',
@@ -278,7 +286,7 @@
 </head>
 <body class="<?php echo $mode;?>">
 <header>
-	<p class="top"><span class="version"> <?php echo myhtmlentities(VERSION); ?></span><a class="<?php is_active(LANGUAGE,'fr'); ?>" href="?lang=fr">FR</a> <a class="<?php is_active(LANGUAGE,'en'); ?>" href="?lang=en">EN</a></p>
+	<p class="top"><span class="version"> <?php echo myhtmlentities(VERSION).' - '.return_safe_search_level(); ?> </span><a class="<?php is_active(LANGUAGE,'fr'); ?>" href="?lang=fr">FR</a> <a class="<?php is_active(LANGUAGE,'en'); ?>" href="?lang=en">EN</a></p>
 	
 	<form action="" method="get" >
 		<input type="hidden" name="lang" value="<?php echo LANGUAGE;?>"/>
