@@ -5,7 +5,7 @@
 		hr{border:none;border-top:1px solid #aaa;}
 		h3,.title{font-weight: normal;}
 		.title b{font-style: italic!important}
-		form{margin:0;padding:0;line-height:20px;}
+		form{margin:0;padding:0;line-height:35px;}
 		header{text-align:left;width:auto;background-color:#ddd;padding:0;border-bottom:1px solid #ccc;}
 		header,footer{
 			background-image: -moz-linear-gradient(top, #eeeeee, #ddd);
@@ -31,12 +31,14 @@
 		nav li.active{color:red;font-weight: bold;border-bottom:4px solid red;}
 		nav li a{color:#666;}
 		nav li a:hover{color:#111;}
-		input[type=text]{font-size:16px;height:30px;width:50%;border-radius: 3px; padding:3px;border:1px solid #ccc;box-shadow: inset 0 1px 2px #ddd;margin-left:10px;}
+		input[type=text], #color_selection, #size_selection{font-size:16px;height:30px;width:50%;border-radius: 3px; padding:3px;border:1px solid #ccc;box-shadow: inset 0 1px 2px #ddd;margin-left:10px;margin-top:1px;}
 		input[type=text]:hover{border-color:#aaa;}
 		input[type=submit]{height:30px;width:40px;font-size:14px;background-color:#4a8cf7;border:1px solid #397be6;border-radius: 3px;color:#eee; box-shadow:  0 1px 2px #397be6}
 		input[type=submit]:hover{background-color:#397be6;border-color:#286ad5 }
 		input[type=submit]:active{background-color:#397be6;border-color:transparent;border-top:2px solid transparent;box-shadow:  0 0px 1px #397be6;}
 		/*Web results*/
+		aside ol{padding:0; margin: 0;margin-left:10px;}
+		
 		.result{padding:5px 10px ;margin:0;border-radius:3px;word-wrap:break-word;overflow-wrap: break-word;-webkit-hyphens:auto;-moz-hyphens:auto;-ms-hyphens:auto;}
 		.result:hover,.image:hover, .video:hover{background-color:#ddd!important;}
 		.result:nth-child(odd),.image:nth-child(odd){background-color:#eee;}
@@ -88,6 +90,24 @@
 		.ss_on{color:lightgreen;font-weight: normal;}
 		.ss_images{color:yellow;font-weight: bold;}
 
+		/* couleurs pour le choix des images*/
+		#color_selection, #size_selection{width:auto;txtc }
+		#color_selection option{background-color:white;color:black;}
+		
+		.red,.rouge{background-color:red!important;}
+		.orange, .naranja{background-color:orange!important;}
+		.yellow, .jaune{background-color:yellow!important;color:black;}
+		.white, .blanc{background-color:white!important;color:black;}
+		.gray, .gris{background-color:gray!important;}
+		.pink, .rose{background-color:pink!important;}
+		.brown, .marron{background-color:brown!important;}
+		.green, .vert{background-color:green!important;}
+		.teal, .sarcelle{background-color:teal!important;}
+		.blue, .bleu{background-color:blue!important;color:white!important;}
+		.black, .noir{background-color:black!important;color:white!important;}
+		.Transparent,.Color, .couleur{color:black;}
+		.Color, .couleur{}
+		.Black_and_white,.Noir_et_blanc{background-color:#ddd!important;color:#444; txtb}
 
 		@media screen and (max-width: 1100px){
 			.video{width:48%;}
