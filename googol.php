@@ -207,7 +207,9 @@
 		if (!is_array($array)||count($array['links'])==0){echo '<div class="noresult"> '.msg('no results for').' <em>'.$array['query'].'</em> </div>';return false;}
 		
 		if ($mode=='web'){
-			echo '<ol>';
+			echo '<ol start="'.$start.'">';
+			$nbresultsperpage=100;
+			$filtre='';
 			foreach ($array['links'] as $nb => $link){
 				$r=str_replace('#link',urldecode($link),TPL);
 				$r=str_replace('#title',$array['titles'][$nb],$r);
@@ -223,6 +225,8 @@
 			}
 			echo '</ol>';
 		}elseif ($mode=='images'){
+			$nbresultsperpage=20;
+			$filtre='&couleur='.$couleur.'&taille='.$taille;
 			foreach ($array['links'] as $nb => $link){
 				$r=str_replace('#link',$link,TPLIMG);
 				$r=str_replace('#SZ',$array['sz'][$nb],$r);
@@ -238,6 +242,8 @@
 				echo $r;
 			}	
 		}elseif($mode='videos'){ 
+			$nbresultsperpage=10;
+			$filtre='';
 			foreach ($array['links'] as $nb => $link){
 				$array['description'][$nb]=link2YoutubeUser($array['description'][$nb],$link);
 				$r=str_replace('#link',$link,TPLVID);
@@ -257,12 +263,12 @@
 
 		if($array['nb_pages'] != 0){
 			echo '<hr/><p class="footerlogo">'.LOGO1.str_repeat('<em class="o2">o</em>', $array['nb_pages']-1).LOGO2.'</p><div class="pagination">';
-			if ($start>0){echo '<a class="previous" title="'.msg('previous').'" href="?q='.urlencode($array['query']).'&mod='.$mode.'&start='.($start-10).'&lang='.$langue.'&couleur='.$couleur.'&taille='.$taille.'">&#9668;</a>';}
+			if ($start>0){echo '<a class="previous" title="'.msg('previous').'" href="?q='.urlencode($array['query']).'&mod='.$mode.'&start='.($start-$nbresultsperpage).'&lang='.$langue.$filtre.'">&#9668;</a>';}
 			for ($i=0;$i<$array['nb_pages']-1;$i++){
-				if ($i*10==$array['current_page']){echo '<em>'.($i+1).'</em>';}
-				else{echo '<a href="?q='.urlencode($array['query']).'&mod='.$mode.'&start='.$i.'0&lang='.$langue.'&couleur='.$couleur.'&taille='.$taille.'">'.($i+1).'</a>';}
+				if ($i*$nbresultsperpage==$array['current_page']){echo '<em>'.($i+1).'</em>';}
+				else{echo '<a href="?q='.urlencode($array['query']).'&mod='.$mode.'&start='.($i*$nbresultsperpage).'&lang='.$langue.$filtre.'">'.($i+1).'</a>';}
 			}
-			if ($start<($array['nb_pages']-2)*10){echo '<a class="next" title="'.msg('next').'" href="?q='.urlencode($array['query']).'&mod='.$mode.'&start='.($start+10).'&lang='.$langue.'&couleur='.$couleur.'&taille='.$taille.'">&#9658;</a>';}
+			if ($start<($array['nb_pages']-2)*$nbresultsperpage){echo '<a class="next" title="'.msg('next').'" href="?q='.urlencode($array['query']).'&mod='.$mode.'&start='.($start+$nbresultsperpage).'&lang='.$langue.$filtre.'">&#9658;</a>';}
 			
 			echo  '</div>';
 		}
