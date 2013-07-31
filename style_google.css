@@ -1,6 +1,6 @@
 		*{-webkit-box-sizing: border-box;-moz-box-sizing: border-box;box-sizing: border-box;}
 		body{padding:0;margin:0;font-family:arial, sans-serif;min-width:320px;}
-		aside{padding:0 25px 100px;}
+		aside{padding:0 25px 15px;}
 		a {text-decoration: none; }
 		hr{border:none;border-top:1px solid #aaa;}
 		h3,.title{font-weight: normal;}
@@ -20,14 +20,14 @@
 		header span{white-space :nowrap;margin:0;padding:0;}
 		header span.logo{margin-left:10px;}
 
-		header .msg{font-size:16px;color:#444;font-style:italic;text-shadow:0 1px 1px #FFF;padding:0 10px;}
-		header .top{margin:0;margin-bottom:30px;padding:5px;padding-right:20px;text-align:right;font-weight: bold;color:#aaa;background-color:#2D2D2D;border-bottom:1px solid black;}
+		header .msg{font-size:12px;color:#444;font-style:italic;text-shadow:0 1px 1px #FFF;padding:0 10px;}
+		header .top{margin:0;margin-bottom:15px;padding:5px 10px 0 5px;text-align:right;font-weight: bold;color:#aaa;background-color:#2D2D2D;border-bottom:1px solid black;box-shadow: 0 1px 1px black;}
 		header .top a:hover{color:#aaa;}
 		header .top a{color:#666;}
 		header .top a.active{color:white;font-weight: bold;}
 		header .top .version{float:left;font-size:14px;}
-		nav{padding-left:35px;background-color:white;border-bottom:1px solid #ccc;margin-bottom:40px;}
-		nav li{border-bottom:4px solid transparent;background-color:white; display:inline-block;list-style:none;width:100px;height:30px;font-size:18px;text-align: center;padding-top:4px;}
+		nav{padding-left:5px;background-color:white;border-bottom:1px solid #ccc;margin-bottom:40px;}
+		nav li{border-bottom:4px solid transparent;background-color:white; display:inline-block;list-style:none;width:100px;height:25px;font-size:14px;text-align: center;padding-top:4px;}
 		nav li.active{color:red;font-weight: bold;border-bottom:4px solid red;}
 		nav li a{color:#666;}
 		nav li a:hover{color:#111;}
@@ -39,7 +39,7 @@
 		/*Web results*/
 		aside ol{padding:0; margin: 0;list-style-position: inside}
 		
-		.result{padding:5px 10px ;margin:0;border-radius:3px;word-wrap:break-word;overflow-wrap: break-word;-webkit-hyphens:auto;-moz-hyphens:auto;-ms-hyphens:auto;}
+		.result{font-size:12px;padding:5px 5px ;margin:0;border-radius:3px;word-wrap:break-word;overflow-wrap: break-word;-webkit-hyphens:auto;-moz-hyphens:auto;-ms-hyphens:auto;}
 		.result:hover,.image:hover, .video:hover{background-color:#ddd!important;}
 		.result:nth-child(odd),.image:nth-child(odd){background-color:#eee;}
 
@@ -75,9 +75,16 @@
 		.pagination .next,.pagination .previous{display:inline-block;width: 50px;}
 		.footerlogo{text-align:center;padding:0;margin:0;font-size:22px;font-weight:bold;user-select: none;-webkit-user-select: none;}
 		.footerlogo em{font-style: normal;display:inline-block;}
-		footer{position:fixed;bottom:0;left:0;right:0;height:auto;min-height:40px;border-top:solid 1px #ddd;margin-top:30px;background-color:#EEE;text-align: right;color:#555;line-height: 30px;padding-right:10px;padding-bottom:5px;}
-		footer a{color:#444;font-weight: bold;}
-		footer img{vertical-align: middle}
+		
+		.infos_icon{display:inline-block;cursor: pointer;line-height:20px;}
+		.infos_icon:hover + .infos,.infos:hover{display:block!important;}
+		.infos{display:none;height:auto;font-size:14px!important;
+			text-align: right;width:100%;
+			color:#BBB;padding-bottom:5px;}
+		.infos a{color:#999;font-weight: bold;}
+		.infos em{font-size:14px!important; font-family:arial, sans-serif;}
+		.infos img{vertical-align: middle}
+
 		.noresult{text-align:center;margin-top:5px;color:#444;}
 		.noresult em{color:black;font-weight: bold;}
 		
@@ -114,4 +121,16 @@
 		}
 		@media screen and (max-width: 670px){
 			.video{width:100%;}
+		}
+		@media screen and (max-width: 480px){
+			.logo{display:block!important;text-align: center;}
+			header span input[type=text]{width:80%!important;margin-bottom:15px;}
+			select{width:80%!important;}
+			#size_selection{margin-bottom:15px;}
+			aside{padding:0 0 15px;}
+			.nomobile{display:none;}
+			nav li{font-size:18px;height:30px;}
+
+			div.image{width:100%;}
+			div.image img{width:100%;height:auto;}
 		}

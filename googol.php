@@ -26,7 +26,7 @@
 	define('URL','https://www.google.com/search?hl='.LANGUAGE.SAFESEARCH_LEVEL.'&id=hp&q=');
 	define('URLIMG','&tbm=isch&biw=1920&bih=1075');
 	define('URLVID','&tbm=vid');
-	define('VERSION','v1.4');
+	define('VERSION','v1.5');
 	define('USE_GOOGLE_THUMBS',false);
 	define('THEME','style_google.css');
 
@@ -204,7 +204,7 @@
 
 	function render_query($array){
 		global $start,$langue,$mode,$couleur,$taille;
-		if (!is_array($array)||count($array['links'])==0){echo '<div class="noresult"> '.msg('no results for').' <em>'.$array['query'].'</em> </div>';return false;}
+		if (!is_array($array)||count($array['links'])==0){echo '<div class="noresult"> '.msg('no results for').' <em>'.myhtmlentities($array['query']).'</em> </div>';return false;}
 		
 		if ($mode=='web'){
 			echo '<ol start="'.$start.'">';
@@ -326,7 +326,19 @@
 </head>
 <body class="<?php echo $mode;?>">
 <header>
-	<p class="top"><span class="version"> <?php echo myhtmlentities(VERSION).' - '.return_safe_search_level(); ?> </span><a class="<?php is_active(LANGUAGE,'fr'); ?>" href="?lang=fr">FR</a> <a class="<?php is_active(LANGUAGE,'en'); ?>" href="?lang=en">EN</a></p>
+	<p class="top">
+		<span class="version"> <?php echo myhtmlentities(VERSION).' - '.return_safe_search_level(); ?> </span>
+		<a class="<?php is_active(LANGUAGE,'fr'); ?>" href="?lang=fr">FR</a> 
+		<a class="<?php is_active(LANGUAGE,'en'); ?>" href="?lang=en">EN</a>
+		<a class="infos_icon nomobile">&copy;</a>
+		<span class="infos nomobile">
+			<a href="<?php echo RACINE;?>">Googol</a> <?php echo msg('by');?> 
+			<a href="http://warriordudimanche.net">Bronco - warriordudimanche.net</a> 
+			<a href="#" title="<?php echo msg('Free and open source (please keep a link to warriordudimanche.net for the author ^^)');?>"><em>Licence</em></a>  
+			<a href="https://github.com/broncowdd/googol" title="<?php echo msg('on GitHub');?>" class="github wot-exclude "> </a> <a href="http://flattr.com/thing/1319925/broncowddSnippetVamp-on-GitHub" target="_blank"><img src="http://images.warriordudimanche.net/flattr.png" alt="Flattr this" title="Flattr this" border="0" /></a>
+			<a href="http://duckduckgo.com" title="<?php echo msg('Otherwise, use a real Search engine !');?>" class="ddg wot-exclude "> </a>
+		</span>
+	</p>
 	
 	<form action="" method="get" >
 		<input type="hidden" name="lang" value="<?php echo LANGUAGE;?>"/>
@@ -397,10 +409,10 @@
 
 
 	</form>
-	<p class="msg">
+	<p class="msg nomobile">
 		<?php 
 			echo msg('Search anonymously on Google (direct links, fake referer)'); 
-			if ($mode!=''){	echo '<br/>'.msg('The thumbnails are temporarly stored in this server to hide your ip from Google...');	} 
+			if ($mode!='web'){	echo '<br/>'.msg('The thumbnails are temporarly stored in this server to hide your ip from Google...');	} 
 		?> 
 	</p>
 		
@@ -415,13 +427,7 @@
 <aside>
 	<?php if ($q_raw!=''){render_query(parse_query($q_raw,$start,$mode));} ?>
 </aside>
-<footer>
-	<a href="<?php echo RACINE;?>">Googol</a> <?php echo msg('by');?> 
-	<a href="http://warriordudimanche.net">Bronco - warriordudimanche.net</a> 
-	<a href="#" title="<?php echo msg('Free and open source (please keep a link to warriordudimanche.net for the author ^^)');?>"><em>Licence</em></a>  
-	<a href="https://github.com/broncowdd/googol" title="<?php echo msg('on GitHub');?>" class="github wot-exclude "> </a> <a href="http://flattr.com/thing/1319925/broncowddSnippetVamp-on-GitHub" target="_blank"><img src="http://images.warriordudimanche.net/flattr.png" alt="Flattr this" title="Flattr this" border="0" /></a>
-	<a href="http://duckduckgo.com" title="<?php echo msg('Otherwise, use a real Search engine !');?>" class="ddg wot-exclude "> </a>
-</footer>
+
 <?php if(USE_WEB_OF_TRUST){echo '<script type="text/javascript" src="http://api.mywot.com/widgets/ratings.js"></script>';}?> 
 	<script language="javascript"> 
 		function change_class(classe) { 
