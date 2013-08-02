@@ -37,22 +37,22 @@
 		if (!is_dir('thumbs')){mkdir('thumbs');}// crée le dossier thumbs si nécessaire
 	}
 	$lang['fr']=array(
-		'previous'=>myhtmlentities('Page précédente'),
+		'previous'=>htmlspecialchars('Page précédente'),
 		'next'=>'Page suivante',
-		'The thumbnails are temporarly stored in this server to hide your ip from Google...'=>myhtmlentities('les miniatures sont temporairement récupérées sur ce serveur, google n\'a pas votre IP...'),
-		'Search anonymously on Google (direct links, fake referer)'=>myhtmlentities('Rechercher anonymement sur Google (liens directs et referrer caché)'),
-		'Free and open source (please keep a link to warriordudimanche.net for the author ^^)'=>myhtmlentities('Libre et open source, merci de laisser un lien vers warriordudimanche.net pour citer l\'auteur ;)'),
+		'The thumbnails are temporarly stored in this server to hide your ip from Google...'=>htmlspecialchars('les miniatures sont temporairement récupérées sur ce serveur, google n\'a pas votre IP...'),
+		'Search anonymously on Google (direct links, fake referer)'=>htmlspecialchars('Rechercher anonymement sur Google (liens directs et referrer caché)'),
+		'Free and open source (please keep a link to warriordudimanche.net for the author ^^)'=>htmlspecialchars('Libre et open source, merci de laisser un lien vers warriordudimanche.net pour citer l\'auteur ;)'),
 		'Googol - google without lies'=>'Googol - google sans mensonge',
 		'on GitHub'=>'sur GitHub',
-		'no results for'=>myhtmlentities('pas de résultat pour '),
+		'no results for'=>htmlspecialchars('pas de résultat pour '),
 		'by'=>'par',
 		'search '=>'recherche ',
-		'Videos'=>myhtmlentities('Vidéos'),
+		'Videos'=>htmlspecialchars('Vidéos'),
 		'Search'=>'Rechercher',
 		'Otherwise, use a real Search engine !'=>'Sinon, utilisez un vrai moteur de recherche !',
-		'Filter on'=>myhtmlentities('Filtre activé'),
-		'Filter off'=>myhtmlentities('Filtre désactivé'),
-		'Filter images only'=>myhtmlentities('Filtre activé sur les images'),
+		'Filter on'=>htmlspecialchars('Filtre activé'),
+		'Filter off'=>htmlspecialchars('Filtre désactivé'),
+		'Filter images only'=>htmlspecialchars('Filtre activé sur les images'),
 		'red'=>'rouge',
 		'yellow'=>'jaune',
 		'green'=>'vert',
@@ -204,7 +204,7 @@
 
 	function render_query($array){
 		global $start,$langue,$mode,$couleur,$taille;
-		if (!is_array($array)||count($array['links'])==0){echo '<div class="noresult"> '.msg('no results for').' <em>'.myhtmlentities($array['query']).'</em> </div>';return false;}
+		if (!is_array($array)||count($array['links'])==0){echo '<div class="noresult"> '.msg('no results for').' <em>'.htmlspecialchars($array['query']).'</em> </div>';return false;}
 		
 		if ($mode=='web'){
 			echo '<ol start="'.$start.'">';
@@ -290,7 +290,7 @@
 	}
 	function clear_cache($delay=180){$fs=glob('thumbs/*'); if(!empty($fs)){foreach ($fs as $file){if (@date('U')-@date(filemtime($file))>$delay){unlink ($file);}}}}
 	function is_active($first,$second){if ($first==$second){echo 'active';}else{echo '';}}
- 	function myhtmlentities($string){$temp=htmlentities($string, ENT_QUOTES, 'UTF-8');if ($temp==''){return $string;}else{return $temp;}}
+ 	//function myhtmlentities($string){$temp=htmlentities($string, ENT_QUOTES, 'UTF-8');if ($temp==''){return $string;}else{return $temp;}}
  	
 
  	#######################################################################
@@ -304,7 +304,7 @@
 	else{$filtre=$taille=$couleur='';}
 	if (isset($_GET['q'])){
 		$q_raw=$_GET['q'];
-		if (!$q_txt=myhtmlentities($_GET['q'])){$q_txt=$_GET['q'];} 
+		if (!$q_txt=htmlspecialchars($_GET['q'])){$q_txt=$_GET['q'];} 
 		$title='Googol '.msg('search ').$q_txt;
 	}else{
 		$q_txt=$q_raw='';$title=msg('Googol - google without lies');
@@ -327,7 +327,7 @@
 <body class="<?php echo $mode;?>">
 <header>
 	<p class="top">
-		<span class="version"> <?php echo myhtmlentities(VERSION).' - '.return_safe_search_level(); ?> </span>
+		<span class="version"> <?php echo htmlspecialchars(VERSION).' - '.return_safe_search_level(); ?> </span>
 		<a class="<?php is_active(LANGUAGE,'fr'); ?>" href="?lang=fr">FR</a> 
 		<a class="<?php is_active(LANGUAGE,'en'); ?>" href="?lang=en">EN</a>
 		<a class="infos_icon nomobile">&copy;</a>
