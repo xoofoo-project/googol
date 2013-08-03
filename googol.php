@@ -316,8 +316,8 @@
 <html dir="ltr" lang="fr">
 <head>
 	<title><?php echo $title;?> </title>
-	
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<meta charset="UTF-8" />
+    	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<?php if (is_file('favicon.png')){echo '<link rel="shortcut icon" href="favicon.png" /> ';}?>
 	<link rel="stylesheet" type="text/css" href="<?php echo THEME;?>"  media="screen" />
 	<link rel="search" type="application/opensearchdescription+xml" title="<?php echo msg('Googol - google without lies'); ?>" href="<?php echo RACINE;?>/googol.xml">
