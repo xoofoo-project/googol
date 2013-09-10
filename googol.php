@@ -1,5 +1,5 @@
 <?php
-	if (isset($_GET['lang'])){$langue=$_GET['lang'];}else{$langue=lang();}
+	if (isset($_GET['lang'])){$langue=htmlspecialchars($_GET['lang']);}else{$langue=htmlspecialchars(lang());}
 	clear_cache();// vire les thumbs de plus de trois minutes
 	define('LANGUAGE',$langue);
 	define('RACINE','http://'.$_SERVER['SERVER_NAME']);
@@ -296,11 +296,11 @@
  	#######################################################################
 	## Gestion GET
 	#######################################################################
-	if (isset($_GET['mod'])){$mode=$_GET['mod'];}else{$mode='web';}
-	if (isset($_GET['start'])){$start=$_GET['start'];}else{$start='';}
-	if (!empty($_GET['couleur'])&&empty($_GET['taille'])){$filtre=$couleur=$_GET['couleur'];$taille='';}
-	elseif (!empty($_GET['taille'])&&empty($_GET['couleur'])){$filtre=$taille=$_GET['taille'];$couleur='';}
-	elseif (!empty($_GET['taille'])&&!empty($_GET['couleur'])){$taille=$_GET['taille'];$couleur=$_GET['couleur'];$filtre=$couleur.','.$taille;}
+	if (isset($_GET['mod'])){$mode=htmlspecialchars($_GET['mod']);}else{$mode='web';}
+	if (isset($_GET['start'])){$start=htmlspecialchars($_GET['start']);}else{$start='';}
+	if (!empty($_GET['couleur'])&&empty($_GET['taille'])){$filtre=$couleur=htmlspecialchars($_GET['couleur']);$taille='';}
+	elseif (!empty($_GET['taille'])&&empty($_GET['couleur'])){$filtre=$taille=htmlspecialchars($_GET['taille']);$couleur='';}
+	elseif (!empty($_GET['taille'])&&!empty($_GET['couleur'])){$taille=htmlspecialchars($_GET['taille']);$couleur=htmlspecialchars($_GET['couleur']);$filtre=$couleur.','.$taille;}
 	else{$filtre=$taille=$couleur='';}
 	if (isset($_GET['q'])){
 		$q_raw=$_GET['q'];
