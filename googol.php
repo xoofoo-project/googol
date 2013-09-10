@@ -1,5 +1,5 @@
 <?php
-	if (isset($_GET['lang'])){$langue=htmlspecialchars($_GET['lang']);}else{$langue=lang();}
+	if (isset($_GET['lang'])){$langue=htmlspecialchars($_GET['lang']);}else{$langue=htmlspecialchars(lang());}
 	clear_cache();// vire les thumbs de plus de trois minutes
 	define('LANGUAGE',$langue);
 	define('RACINE','http://'.$_SERVER['SERVER_NAME']);
