@@ -120,6 +120,7 @@
 	}
 	function file_curl_contents($url){
 		$ch = curl_init();
+		curl_setopt($ch, CURLOPT_HTTPHEADER, array('Accept-Charset: UTF-8'));
 		curl_setopt($ch, CURLOPT_HEADER, 0);
 		curl_setopt($ch, CURLOPT_SSL_VERIFYPEER,  FALSE);
 		curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
@@ -127,12 +128,12 @@
 		if (!ini_get("safe_mode") && !ini_get('open_basedir') ) {curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);}
 		curl_setopt($ch, CURLOPT_MAXREDIRS, 10);
 		curl_setopt($ch, CURLOPT_REFERER, random_referer());// notez le referer "custom"
-		$data = iconv('ISO-8859-1', 'UTF-8//TRANSLIT', curl_exec($ch)); // Google seems to be sending ISO encoded page, why??
+		$data = html_entity_decode(iconv('ISO-8859-1', 'UTF-8//TRANSLIT', curl_exec($ch))); // Google seems to be sending ISO encoded page + htmlentities, why??
 		# $data = curl_exec($ch);
 		curl_close($ch);
 
 		return $data;
-	}  
+	}
 	function add_search_engine(){
 		if(!is_file('googol.xml')){
 			file_put_contents('googol.xml', '<OpenSearchDescription xmlns="http://a9.com/-/spec/opensearch/1.1/"
@@ -285,13 +286,17 @@
 		}
 	}
 	function grab_google_thumb($link){
-		if ($thumb=file_curl_contents($link)){
-			$local='thumbs/'.preg_replace('#[^a-zA-Z0-9-_.]#','',$link).'.jpg';
-			if (!is_file($local)){file_put_contents($local,$thumb);}
+		$local = 'thumbs/'.md5($link).'.jpg';
+
+		if(is_file($local)) return $local;
+
+		if($thumb = file_curl_contents($link))
+		{
+			file_put_contents($local, $thumb);
 			return $local;
-		}else{
-			return $link;
 		}
+		
+		return $link;
 	}
 	function link2YoutubeUser($desc,$link){
 		if (stristr($link,'youtube.com')){
@@ -299,9 +304,23 @@
 		};
 		return $desc;
 	}
-	function clear_cache($delay=180){$fs=glob('thumbs/*'); if(!empty($fs)){foreach ($fs as $file){if (@date('U')-@date(filemtime($file))>$delay){unlink ($file);}}}}
-	function is_active($first,$second){if ($first==$second){echo 'active';}else{echo '';}}
-		//function myhtmlentities($string){$temp=htmlentities($string, ENT_QUOTES, 'UTF-8');if ($temp==''){return $string;}else{return $temp;}}
+	function clear_cache($delay=180){
+		$fs=glob('thumbs/*');
+		if(!empty($fs)){
+			foreach ($fs as $file){
+				if (@date('U')-@date(filemtime($file))>$delay){
+					unlink ($file);
+				}
+			}
+		}
+	}
+	function is_active($first,$second){
+		if ($first==$second){
+			echo 'active';
+		}else{
+			echo '';
+		}
+	}
 		
 
 	#######################################################################
