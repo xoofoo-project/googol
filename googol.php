@@ -1,16 +1,26 @@
 <?php
-	if (isset($_GET['lang'])){$langue=htmlspecialchars($_GET['lang']);}else{$langue=htmlspecialchars(lang());}
+
+	// Sometimes, htmlspecialchars seems to return empty strings for unknown reasons (for me), this supposedly does exactly the same as htmlspecialchars (with default args) but always returns something.
+	function my_htmlspecialchars($str) {
+		return str_replace(
+			array('&', '<', '>', '"'),
+			array('&amp;', '&lt;', '&gt;', '&quot;'),
+			$str
+		);
+	}
+
+	if (isset($_GET['lang'])){$langue=my_htmlspecialchars($_GET['lang']);}else{$langue=my_htmlspecialchars(lang());}
 	clear_cache();// vire les thumbs de plus de trois minutes
 	define('LANGUAGE',$langue);
 	define('RACINE','http://'.$_SERVER['SERVER_NAME']);
 	define('USE_WEB_OF_TRUST',true);
 	define('WOT_URL','http://www.mywot.com/scorecard/');
 	define('REGEX_WEB','#(?<=<h3 class="r"><a href="/url\?q=)([^&]+).*?>(.*?)</a>.*?(?<=<span class="st">)(.*?)(?=</span>)#');
-	define('REGEX_PAGES','#&start=([0-9]+)|&amp;start=([0-9]+)#');
-	define('REGEX_IMG','#(?<=imgurl=)(.*?)&amp;imgrefurl=(.*?)&amp;.*?h=([0-9]+)&amp;w=([0-9]+)&amp;sz=([0-9]+)|(?<=imgurl=)(.*?)&imgrefurl=(.*?)&.*?h=([0-9]+)&w=([0-9]+)&sz=([0-9]+)#');
+	define('REGEX_PAGES','#&start=([0-9]+)|&start=([0-9]+)#');
+	define('REGEX_IMG','#(?<=imgurl=)(.*?)&imgrefurl=(.*?)&.*?h=([0-9]+)&w=([0-9]+)&sz=([0-9]+)|(?<=imgurl=)(.*?)&imgrefurl=(.*?)&.*?h=([0-9]+)&w=([0-9]+)&sz=([0-9]+)#');
 	define('REGEX_THMBS','#<img.*?height="([0-9]+)".*?width="([0-9]+)".*?src="([^"]+)"#');
 
-	define('REGEX_VID','#(?:<img.*?src="([^"]+)".*?width="([0-9]+)".*?)?<h3 class="r">[^<]*<a href="/url\?q=(.*?)(?:&amp;|&).*?">(.*?)</a>.*?<cite[^>]*>(.*?)</cite>.*?<span class="(?:st|f)">(.*?)(?:</span></td>|</span><br></?div>)#');
+	define('REGEX_VID','#(?:<img.*?src="([^"]+)".*?width="([0-9]+)".*?)?<h3 class="r">[^<]*<a href="/url\?q=(.*?)(?:&|&).*?">(.*?)</a>.*?<cite[^>]*>(.*?)</cite>.*?<span class="(?:st|f)">(.*?)(?:</span></td>|</span><br></?div>)#');
 	define('REGEX_VID_THMBS','#<img.*?src="([^"]+)".*?width="([0-9]+)"#');
 	define('TPL','<li class="result"><a rel="noreferrer" href="#link"><h3 class="title">#title</h3>#link</a>#wot<p class="description">#description</p></li>');
 	define('TPLIMG','<div class="image" ><p><a rel="noreferrer" href="#link" title="#link">#thumbs</a></p><p class="description">#W x #H (#SZ ko)<a class="source" href="#site" title="#site"> &#9658;</a></p></div>');
@@ -37,22 +47,22 @@
 		if (!is_dir('thumbs')){mkdir('thumbs');}// crée le dossier thumbs si nécessaire
 	}
 	$lang['fr']=array(
-		'previous'=>htmlspecialchars('Page précédente'),
+		'previous'=>my_htmlspecialchars('Page précédente'),
 		'next'=>'Page suivante',
-		'The thumbnails are temporarly stored in this server to hide your ip from Google...'=>htmlspecialchars('les miniatures sont temporairement récupérées sur ce serveur, google n\'a pas votre IP...'),
-		'Search anonymously on Google (direct links, fake referer)'=>htmlspecialchars('Rechercher anonymement sur Google (liens directs et referrer caché)'),
-		'Free and open source (please keep a link to warriordudimanche.net for the author ^^)'=>htmlspecialchars('Libre et open source, merci de laisser un lien vers warriordudimanche.net pour citer l\'auteur ;)'),
+		'The thumbnails are temporarly stored in this server to hide your ip from Google…'=>my_htmlspecialchars('les miniatures sont temporairement récupérées sur ce serveur, google n\'a pas votre IP…'),
+		'Search anonymously on Google (direct links, fake referer)'=>my_htmlspecialchars('Rechercher anonymement sur Google (liens directs et referrer caché)'),
+		'Free and open source (please keep a link to warriordudimanche.net for the author ^^)'=>my_htmlspecialchars('Libre et open source, merci de laisser un lien vers warriordudimanche.net pour citer l\'auteur ;)'),
 		'Googol - google without lies'=>'Googol - google sans mensonge',
 		'on GitHub'=>'sur GitHub',
-		'no results for'=>htmlspecialchars('pas de résultat pour '),
+		'no results for'=>my_htmlspecialchars('pas de résultat pour '),
 		'by'=>'par',
 		'search '=>'recherche ',
-		'Videos'=>htmlspecialchars('Vidéos'),
+		'Videos'=>my_htmlspecialchars('Vidéos'),
 		'Search'=>'Rechercher',
 		'Otherwise, use a real Search engine !'=>'Sinon, utilisez un vrai moteur de recherche !',
-		'Filter on'=>htmlspecialchars('Filtre activé'),
-		'Filter off'=>htmlspecialchars('Filtre désactivé'),
-		'Filter images only'=>htmlspecialchars('Filtre activé sur les images'),
+		'Filter on'=>my_htmlspecialchars('Filtre activé'),
+		'Filter off'=>my_htmlspecialchars('Filtre désactivé'),
+		'Filter images only'=>my_htmlspecialchars('Filtre activé sur les images'),
 		'red'=>'rouge',
 		'yellow'=>'jaune',
 		'green'=>'vert',
@@ -75,7 +85,7 @@
 		);
 
 
- 	#######################################################################
+	#######################################################################
 	## Fonctions
 	#######################################################################
 	function aff($a,$stop=true,$line){echo 'Arret a la ligne '.$line.' du fichier '.__FILE__.'<pre>';var_dump($a);echo '</pre>';if ($stop){exit();}}
@@ -87,7 +97,7 @@
 		if (SAFESEARCH_LEVEL==SAFESEARCH_IMAGESONLY){return '<b class="ss_images">'.msg('Filter images only').'</b>';}
 	}
 	function Random_referer(){
-		$rr=array(
+		return array_rand(array(
 			'http://oudanstoncul.com.free.fr/‎',
 			'http://googlearretedenousfliquer.fr/‎',
 			'http://stopspyingme.fr/‎',
@@ -106,27 +116,35 @@
 			'http://jtepourristesstats.fr/‎',
 			'http://ontecompissevigoureusement.com/‎',
 			'http://lepoingleveetlemajeuraussi.com/‎',
-		);
-		shuffle($rr);
-		return $rr[0];
+		));
 	}
 	function file_curl_contents($url){
 		$ch = curl_init();
+		curl_setopt($ch, CURLOPT_HTTPHEADER, array('Accept-Charset: UTF-8'));
 		curl_setopt($ch, CURLOPT_HEADER, 0);
-		curl_setopt($ch, CURLOPT_SSL_VERIFYPEER,  FALSE);     
-		curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);     
-		curl_setopt($ch, CURLOPT_URL, $url);     
-		if (!ini_get("safe_mode") && !ini_get('open_basedir') ) {curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);}    
-		curl_setopt($ch, CURLOPT_MAXREDIRS, 10); 
+		curl_setopt($ch, CURLOPT_SSL_VERIFYPEER,  FALSE);
+		curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+		curl_setopt($ch, CURLOPT_URL, $url);
+		if (!ini_get("safe_mode") && !ini_get('open_basedir') ) {curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);}
+		curl_setopt($ch, CURLOPT_MAXREDIRS, 10);
 		curl_setopt($ch, CURLOPT_REFERER, random_referer());// notez le referer "custom"
-		$data = curl_exec($ch);     
-		curl_close($ch);     
-		return $data; 
-	}  
+
+		$data = curl_exec($ch);
+		$response_headers = curl_getinfo($ch);
+
+		// Google seems to be sending ISO encoded page + htmlentities, why??
+		if($response_headers['content_type'] == 'text/html; charset=ISO-8859-1') $data = html_entity_decode(iconv('ISO-8859-1', 'UTF-8//TRANSLIT', $data)); 
+		
+		# $data = curl_exec($ch);
+
+		curl_close($ch);
+
+		return $data;
+	}
 	function add_search_engine(){
 		if(!is_file('googol.xml')){
 			file_put_contents('googol.xml', '<OpenSearchDescription xmlns="http://a9.com/-/spec/opensearch/1.1/"
-              xmlns:moz="http://www.mozilla.org/2006/browser/search/">
+			  xmlns:moz="http://www.mozilla.org/2006/browser/search/">
 			  <ShortName>Googol</ShortName>
 			  <Description>'.msg('Googol - google without lies').'</Description>
 			  <InputEncoding>UTF-8</InputEncoding>
@@ -142,6 +160,7 @@
 		global $mode,$filtre;
 		if ($mode=='web'){ 
 			$page=file_curl_contents(URL.str_replace(' ','+',urlencode($query)).'&start='.$start.'&num=100');
+			# var_dump(my_htmlspecialchars($page));
 			if (!$page){return false;}
 			preg_match_all(REGEX_WEB, $page, $r);
 			preg_match_all(REGEX_PAGES,$page,$p);
@@ -177,8 +196,7 @@
 				'current_page'=>$start,
 				'query'=>$query,
 				'mode'=>$mode
-				);			
-		
+				);
 			return $retour;		
 		}elseif($mode=="videos"){
 			$page=file_curl_contents(URL.str_replace(' ','+',urlencode($query)).URLVID.'&start='.$start);
@@ -189,7 +207,7 @@
 			$retour=array(
 				'site'=>$r[5],
 				'titre'=>$r[4],
-				'links'=>$r[3],
+				'links'=>array_map('urldecode', $r[3]),
 				'description'=>$r[6],
 				'thumbs'=>$r[1],
 				'thumbs_w'=>$r[2],
@@ -204,7 +222,7 @@
 
 	function render_query($array){
 		global $start,$langue,$mode,$couleur,$taille;
-		if (!is_array($array)||count($array['links'])==0){echo '<div class="noresult"> '.msg('no results for').' <em>'.htmlspecialchars($array['query']).'</em> </div>';return false;}
+		if (!is_array($array)||count($array['links'])==0){echo '<div class="noresult"> '.msg('no results for').' <em>'.my_htmlspecialchars($array['query']).'</em> </div>';return false;}
 		
 		if ($mode=='web'){
 			echo '<ol start="'.$start.'">';
@@ -274,13 +292,17 @@
 		}
 	}
 	function grab_google_thumb($link){
-		if ($thumb=file_curl_contents($link)){
-			$local='thumbs/'.preg_replace('#[^a-zA-Z0-9-_.]#','',$link).'.jpg';
-			if (!is_file($local)){file_put_contents($local,$thumb);}
+		$local = 'thumbs/'.md5($link).'.jpg';
+
+		if(is_file($local)) return $local;
+
+		if($thumb = file_curl_contents($link))
+		{
+			file_put_contents($local, $thumb);
 			return $local;
-		}else{
-			return $link;
 		}
+
+		return $link;
 	}
 	function link2YoutubeUser($desc,$link){
 		if (stristr($link,'youtube.com')){
@@ -288,36 +310,49 @@
 		};
 		return $desc;
 	}
-	function clear_cache($delay=180){$fs=glob('thumbs/*'); if(!empty($fs)){foreach ($fs as $file){if (@date('U')-@date(filemtime($file))>$delay){unlink ($file);}}}}
-	function is_active($first,$second){if ($first==$second){echo 'active';}else{echo '';}}
- 	//function myhtmlentities($string){$temp=htmlentities($string, ENT_QUOTES, 'UTF-8');if ($temp==''){return $string;}else{return $temp;}}
- 	
+	function clear_cache($delay=180){
+		$fs=glob('thumbs/*');
+		if(!empty($fs)){
+			foreach ($fs as $file){
+				if (@date('U')-@date(filemtime($file))>$delay){
+					unlink ($file);
+				}
+			}
+		}
+	}
+	function is_active($first,$second){
+		if ($first==$second){
+			echo 'active';
+		}else{
+			echo '';
+		}
+	}
+		
 
- 	#######################################################################
+	#######################################################################
 	## Gestion GET
 	#######################################################################
-	if (isset($_GET['mod'])){$mode=htmlspecialchars($_GET['mod']);}else{$mode='web';}
-	if (isset($_GET['start'])){$start=htmlspecialchars($_GET['start']);}else{$start='';}
-	if (!empty($_GET['couleur'])&&empty($_GET['taille'])){$filtre=$couleur=htmlspecialchars($_GET['couleur']);$taille='';}
-	elseif (!empty($_GET['taille'])&&empty($_GET['couleur'])){$filtre=$taille=htmlspecialchars($_GET['taille']);$couleur='';}
-	elseif (!empty($_GET['taille'])&&!empty($_GET['couleur'])){$taille=htmlspecialchars($_GET['taille']);$couleur=htmlspecialchars($_GET['couleur']);$filtre=$couleur.','.$taille;}
+	if (isset($_GET['mod'])){$mode=my_htmlspecialchars($_GET['mod']);}else{$mode='web';}
+	if (isset($_GET['start'])){$start=my_htmlspecialchars($_GET['start']);}else{$start='';}
+	if (!empty($_GET['couleur'])&&empty($_GET['taille'])){$filtre=$couleur=my_htmlspecialchars($_GET['couleur']);$taille='';}
+	elseif (!empty($_GET['taille'])&&empty($_GET['couleur'])){$filtre=$taille=my_htmlspecialchars($_GET['taille']);$couleur='';}
+	elseif (!empty($_GET['taille'])&&!empty($_GET['couleur'])){$taille=my_htmlspecialchars($_GET['taille']);$couleur=my_htmlspecialchars($_GET['couleur']);$filtre=$couleur.','.$taille;}
 	else{$filtre=$taille=$couleur='';}
 	if (isset($_GET['q'])){
 		$q_raw=$_GET['q'];
-		if (!$q_txt=htmlspecialchars($_GET['q'])){$q_txt=$_GET['q'];} 
+		$q_txt=my_htmlspecialchars($_GET['q']);
 		$title='Googol '.msg('search ').$q_txt;
 	}else{
 		$q_txt=$q_raw='';$title=msg('Googol - google without lies');
 	}
 
 ?>
-
 <!DOCTYPE html>
 <html dir="ltr" lang="fr">
 <head>
 	<title><?php echo $title;?> </title>
 	<meta charset="UTF-8" />
-    	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<?php if (is_file('favicon.png')){echo '<link rel="shortcut icon" href="favicon.png" /> ';}?>
 	<link rel="stylesheet" type="text/css" href="<?php echo THEME;?>"  media="screen" />
 	<link rel="search" type="application/opensearchdescription+xml" title="<?php echo msg('Googol - google without lies'); ?>" href="<?php echo RACINE;?>/googol.xml">
@@ -327,7 +362,7 @@
 <body class="<?php echo $mode;?>">
 <header>
 	<p class="top">
-		<span class="version"> <?php echo htmlspecialchars(VERSION).' - '.return_safe_search_level(); ?> </span>
+		<span class="version"> <?php echo my_htmlspecialchars(VERSION).' - '.return_safe_search_level(); ?> </span>
 		<a class="<?php is_active(LANGUAGE,'fr'); ?>" href="?lang=fr">FR</a> 
 		<a class="<?php is_active(LANGUAGE,'en'); ?>" href="?lang=en">EN</a>
 		<a class="infos_icon nomobile">&copy;</a>
@@ -347,7 +382,8 @@
 			<input type="text" name="q" placeholder="<?php echo msg('Search'); ?>" value="<?php  echo $q_txt; ?>"/>
 			<input type="submit" value="OK"/>
 		</span>
-		<?php 
+		<?php
+
 			if ($mode!=''){echo '<input type="hidden" name="mod" value="'.$mode.'"/>';}
 			if ($mode=='images'){
 				// ajout des options de recherche d'images
@@ -367,7 +403,7 @@
 					'ic:specific,isc:brown'=>'brown',
 					'ic:specific,isc:green'=>'green',
 					'ic:specific,isc:teal'=>'teal',
-					'ic:specific,isc:blue'=>'blue',		
+					'ic:specific,isc:blue'=>'blue',
 				);
 				echo '<select id="color_selection" name="couleur" class="'.$colors[$couleur].'" title="'.msg('Select a color').'" onChange="change_class(this.options[this.selectedIndex].innerHTML);" >';
 				foreach ($colors as $get=>$color){
@@ -403,6 +439,7 @@
 				}
 				echo '</select>';
 			}
+
 		?>
 	
 
@@ -412,7 +449,7 @@
 	<p class="msg nomobile">
 		<?php 
 			echo msg('Search anonymously on Google (direct links, fake referer)'); 
-			if ($mode!='web'){	echo '<br/>'.msg('The thumbnails are temporarly stored in this server to hide your ip from Google...');	} 
+			if ($mode!='web'){	echo '<br/>'.msg('The thumbnails are temporarly stored in this server to hide your ip from Google…');	} 
 		?> 
 	</p>
 		
