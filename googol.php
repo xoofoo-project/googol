@@ -16,11 +16,11 @@
 	define('USE_WEB_OF_TRUST',true);
 	define('WOT_URL','http://www.mywot.com/scorecard/');
 	define('REGEX_WEB','#(?<=<h3 class="r"><a href="/url\?q=)([^&]+).*?>(.*?)</a>.*?(?<=<span class="st">)(.*?)(?=</span>)#');
-	define('REGEX_PAGES','#&start=([0-9]+)|&amp;start=([0-9]+)#');
-	define('REGEX_IMG','#(?<=imgurl=)(.*?)&amp;imgrefurl=(.*?)&amp;.*?h=([0-9]+)&amp;w=([0-9]+)&amp;sz=([0-9]+)|(?<=imgurl=)(.*?)&imgrefurl=(.*?)&.*?h=([0-9]+)&w=([0-9]+)&sz=([0-9]+)#');
+	define('REGEX_PAGES','#&start=([0-9]+)|&start=([0-9]+)#');
+	define('REGEX_IMG','#(?<=imgurl=)(.*?)&imgrefurl=(.*?)&.*?h=([0-9]+)&w=([0-9]+)&sz=([0-9]+)|(?<=imgurl=)(.*?)&imgrefurl=(.*?)&.*?h=([0-9]+)&w=([0-9]+)&sz=([0-9]+)#');
 	define('REGEX_THMBS','#<img.*?height="([0-9]+)".*?width="([0-9]+)".*?src="([^"]+)"#');
 
-	define('REGEX_VID','#(?:<img.*?src="([^"]+)".*?width="([0-9]+)".*?)?<h3 class="r">[^<]*<a href="/url\?q=(.*?)(?:&amp;|&).*?">(.*?)</a>.*?<cite[^>]*>(.*?)</cite>.*?<span class="(?:st|f)">(.*?)(?:</span></td>|</span><br></?div>)#');
+	define('REGEX_VID','#(?:<img.*?src="([^"]+)".*?width="([0-9]+)".*?)?<h3 class="r">[^<]*<a href="/url\?q=(.*?)(?:&|&).*?">(.*?)</a>.*?<cite[^>]*>(.*?)</cite>.*?<span class="(?:st|f)">(.*?)(?:</span></td>|</span><br></?div>)#');
 	define('REGEX_VID_THMBS','#<img.*?src="([^"]+)".*?width="([0-9]+)"#');
 	define('TPL','<li class="result"><a rel="noreferrer" href="#link"><h3 class="title">#title</h3>#link</a>#wot<p class="description">#description</p></li>');
 	define('TPLIMG','<div class="image" ><p><a rel="noreferrer" href="#link" title="#link">#thumbs</a></p><p class="description">#W x #H (#SZ ko)<a class="source" href="#site" title="#site"> &#9658;</a></p></div>');
@@ -128,8 +128,15 @@
 		if (!ini_get("safe_mode") && !ini_get('open_basedir') ) {curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);}
 		curl_setopt($ch, CURLOPT_MAXREDIRS, 10);
 		curl_setopt($ch, CURLOPT_REFERER, random_referer());// notez le referer "custom"
-		$data = html_entity_decode(iconv('ISO-8859-1', 'UTF-8//TRANSLIT', curl_exec($ch))); // Google seems to be sending ISO encoded page + htmlentities, why??
+
+		$data = curl_exec($ch);
+		$response_headers = curl_getinfo($ch);
+
+		// Google seems to be sending ISO encoded page + htmlentities, why??
+		if($response_headers['content_type'] == 'text/html; charset=ISO-8859-1') $data = html_entity_decode(iconv('ISO-8859-1', 'UTF-8//TRANSLIT', $data)); 
+		
 		# $data = curl_exec($ch);
+
 		curl_close($ch);
 
 		return $data;
@@ -189,8 +196,7 @@
 				'current_page'=>$start,
 				'query'=>$query,
 				'mode'=>$mode
-				);			
-		
+				);
 			return $retour;		
 		}elseif($mode=="videos"){
 			$page=file_curl_contents(URL.str_replace(' ','+',urlencode($query)).URLVID.'&start='.$start);
@@ -201,7 +207,7 @@
 			$retour=array(
 				'site'=>$r[5],
 				'titre'=>$r[4],
-				'links'=>$r[3],
+				'links'=>array_map('urldecode', $r[3]),
 				'description'=>$r[6],
 				'thumbs'=>$r[1],
 				'thumbs_w'=>$r[2],
@@ -295,7 +301,7 @@
 			file_put_contents($local, $thumb);
 			return $local;
 		}
-		
+
 		return $link;
 	}
 	function link2YoutubeUser($desc,$link){
