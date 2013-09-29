@@ -156,6 +156,7 @@
 			</OpenSearchDescription>');
 		}
 	}
+	function xss($string){return htmlspecialchars($string,ENT_QUOTES,'UTF-8');}
 	function parse_query($query,$start=0){
 		global $mode,$filtre;
 		if ($mode=='web'){ 
@@ -165,10 +166,11 @@
 			preg_match_all(REGEX_WEB, $page, $r);
 			preg_match_all(REGEX_PAGES,$page,$p);
 			$p=count($p[2]);
+
 			$retour=array(
 				'links'=>$r[1],
 				'titles'=>$r[2],
-				'descriptions'=>$r[3],
+				'descriptions'=>array_map('xss',$r[3]),
 				'nb_pages'=>$p,
 				'current_page'=>$start,
 				'query'=>$query,
@@ -208,7 +210,7 @@
 				'site'=>$r[5],
 				'titre'=>$r[4],
 				'links'=>array_map('urldecode', $r[3]),
-				'description'=>$r[6],
+				'description'=>array_map('xss',$r[6]),
 				'thumbs'=>$r[1],
 				'thumbs_w'=>$r[2],
 				'nb_pages'=>$p,
