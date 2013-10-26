@@ -1,351 +1,353 @@
 <?php
+// Sometimes, htmlspecialchars seems to return empty strings for unknown reasons (for me), this supposedly does exactly the same as htmlspecialchars (with default args) but always returns something.
+function my_htmlspecialchars($str) {
+	return str_replace(
+		array('&', '<', '>', '"'),
+		array('&amp;', '&lt;', '&gt;', '&quot;'),
+		$str
+	);
+}
 
-	// Sometimes, htmlspecialchars seems to return empty strings for unknown reasons (for me), this supposedly does exactly the same as htmlspecialchars (with default args) but always returns something.
-	function my_htmlspecialchars($str) {
-		return str_replace(
-			array('&', '<', '>', '"'),
-			array('&amp;', '&lt;', '&gt;', '&quot;'),
-			$str
-		);
+if (isset($_GET['lang'])){$langue=my_htmlspecialchars($_GET['lang']);}else{$langue=my_htmlspecialchars(lang());}
+clear_cache();// vire les thumbs de plus de trois minutes
+define('LANGUAGE',$langue);
+//define('RACINE','http://'.$_SERVER['SERVER_NAME']);
+define('RACINE','http://'.$_SERVER['HTTP_HOST'] );
+define('USE_WEB_OF_TRUST',true);
+define('WOT_URL','http://www.mywot.com/scorecard/');
+define('REGEX_WEB','#(?<=<h3 class="r"><a href="/url\?q=)([^&]+).*?>(.*?)</a>.*?(?<=<span class="st">)(.*?)(?=</span>)#');
+define('REGEX_PAGES','#&start=([0-9]+)|&start=([0-9]+)#');
+define('REGEX_IMG','#(?<=imgurl=)(.*?)&imgrefurl=(.*?)&.*?h=([0-9]+)&w=([0-9]+)&sz=([0-9]+)|(?<=imgurl=)(.*?)&imgrefurl=(.*?)&.*?h=([0-9]+)&w=([0-9]+)&sz=([0-9]+)#');
+define('REGEX_THMBS','#<img.*?height="([0-9]+)".*?width="([0-9]+)".*?src="([^"]+)"#');
+
+define('REGEX_VID','#(?:<img.*?src="([^"]+)".*?width="([0-9]+)".*?)?<h3 class="r">[^<]*<a href="/url\?q=(.*?)(?:&|&).*?">(.*?)</a>.*?<cite[^>]*>(.*?)</cite>.*?<span class="(?:st|f)">(.*?)(?:</span></td>|</span><br></?div>)#');
+define('REGEX_VID_THMBS','#<img.*?src="([^"]+)".*?width="([0-9]+)"#');
+define('TPL','<li class="result"><a target="_blank" rel="noreferrer" href="#link"><h3 class="title">#title</h3>#link</a>#wot<p class="description">#description</p></li>');
+define('TPLIMG','<div class="image zoom-gallery" ><p><a class="" rel="noreferrer" href="#link" title="" data-source="#link">#thumbs</a></p><p class="description">#W x #H (#SZ ko)<a class="source" href="#site" title="#site"> &#9658;</a></p></div>');
+define('TPLVID','<div class="video"><h3><a class="popup-youtube" rel="noreferrer" href="#link" title="#link">#titre</a></h3><a class="thumb popup-youtube" rel="noreferrer" href="#link" title="#link">#thumbs</a><p class="site">#site</p><p class="description">#description</p></div>');
+define('LOGO1','<a href="'.RACINE.'"><em class="g">G</em><em class="o1">o</em>');
+define('LOGO2','<em class="o2">o</em><em class="g">g</em><em class="o1">o</em><em class="o3">l</em></a>');
+
+define('SAFESEARCH_ON','&safe=on');
+define('SAFESEARCH_IMAGESONLY','&safe=images');
+define('SAFESEARCH_OFF','&safe=off');
+define('SAFESEARCH_LEVEL',SAFESEARCH_ON);// SAFESEARCH_ON, SAFESEARCH_IMAGESONLY, SAFESEARCH_OFF
+
+define('URL','https://www.google.com/search?hl='.LANGUAGE.SAFESEARCH_LEVEL.'&id=hp&q=');
+define('URLIMG','&tbm=isch&biw=1920&bih=1075');
+define('URLVID','&tbm=vid');
+define('VERSION','v1.5');
+define('USE_GOOGLE_THUMBS',false);
+define('THEME','css/style_krisfr.css');
+
+if (!USE_GOOGLE_THUMBS){ 
+	session_start();
+	if (!isset($_SESSION['ID'])){$_SESSION['ID']=uniqid();}
+	define('UNIQUE_THUMBS_PATH','thumbs/'.$_SESSION['ID']);
+	if (!is_dir('thumbs')){mkdir('thumbs');}// crée le dossier thumbs si nécessaire
+}
+$lang['fr']=array(
+	'previous'=>my_htmlspecialchars('Page précédente'),
+	'next'=>'Page suivante',
+	'The thumbnails are temporarly stored in this server to hide your ip from Google…'=>my_htmlspecialchars('les miniatures sont temporairement récupérées sur ce serveur, google n\'a pas votre IP…'),
+	'Search anonymously on Google (direct links, fake referer)'=>my_htmlspecialchars('Rechercher anonymement sur Google (liens directs et referrer caché)'),
+	'Free and open source (please keep a link to warriordudimanche.net for the author ^^)'=>my_htmlspecialchars('Libre et open source, merci de laisser un lien vers warriordudimanche.net pour citer l\'auteur ;)'),
+	'Googol - google without lies'=>'Googol - Google sans mensonge',
+	'GitHub'=>'GitHub',
+	'no results for'=>my_htmlspecialchars('pas de résultat pour '),
+	'by'=>'par',
+	'search '=>'recherche ',
+	'Videos'=>my_htmlspecialchars('Vidéos'),
+	'Search'=>'Rechercher',
+	'Otherwise, use a real Search engine !'=>'Sinon, utilisez un vrai moteur de recherche !',
+	'Filter on'=>my_htmlspecialchars('Filtre activé'),
+	'Filter off'=>my_htmlspecialchars('Filtre désactivé'),
+	'Filter images only'=>my_htmlspecialchars('Filtre activé sur les images'),
+	'red'=>'rouge',
+	'yellow'=>'jaune',
+	'green'=>'vert',
+	'white'=>'blanc',
+	'gray'=>'gris',
+	'teal'=>'sarcelle',
+	'black'=>'noir',
+	'pink'=>'rose',
+	'blue'=>'bleu',
+	'brown'=>'marron',
+	'Black_and_white'=>'Noir_et_blanc',
+	'Color'=>'couleur',
+	'all colors'=>'toutes les couleurs',
+	'all sizes'=>'toutes les tailles',
+	'Select a color'=>'Filtrer par couleur',
+	'Select a size'=>'Filtrer par taille',
+	'Big'=>'Grande',
+	'Medium'=>'Moyenne',
+	'Icon'=>'Petite',
+	'Project on Github'=>'Projet sur Github',
+	'Give a beer to the author!'=>my_htmlspecialchars('Offrez une bière à l\'auteur'),
+	'By'=>'Par',
+	'modified by'=>my_htmlspecialchars('modifié par'),
+	);
+
+#######################################################################
+## Fonctions
+#######################################################################
+function aff($a,$stop=true,$line){echo 'Arret a la ligne '.$line.' du fichier '.__FILE__.'<pre>';var_dump($a);echo '</pre>';if ($stop){exit();}}
+function msg($m){global $lang;if(isset($lang[LANGUAGE][$m])){return $lang[LANGUAGE][$m];}else{return $m;}}
+function lang($default='fr'){if (isset($_SERVER['HTTP_ACCEPT_LANGUAGE'])){$l=explode(',',$_SERVER['HTTP_ACCEPT_LANGUAGE']);return substr($l[0],0,2);}else{return $default;}}
+function return_safe_search_level(){
+	if (SAFESEARCH_LEVEL==SAFESEARCH_ON){return '<b class="ss_on">'.msg('Filter on').'</b>';}
+	if (SAFESEARCH_LEVEL==SAFESEARCH_OFF){return '<b class="ss_off">'.msg('Filter off').'</b>';}
+	if (SAFESEARCH_LEVEL==SAFESEARCH_IMAGESONLY){return '<b class="ss_images">'.msg('Filter images only').'</b>';}
+}
+function Random_referer(){
+	return array_rand(array(
+		'http://oudanstoncul.com.free.fr/‎',
+		'http://googlearretedenousfliquer.fr/‎',
+		'http://stopspyingme.fr/‎',
+		'http://spyyourassfuckinggoogle.fr/‎',
+		'http://dontfuckinglookatme.fr/‎',
+		'http://matemonculgoogle.fr/‎',
+		'http://auxarmescitoyens.fr/‎',
+		'http://jetlametsavecdugravier.con/‎',
+		'http://lesdeuxpiedsdanstagueule.fr/‎',
+		'http://moncoudedanstabouche.con/‎',
+		'http://monpieddanston.uk/‎',
+		'http://bienfaitpourvosgueul.es/‎',
+		'http://pandanstesdents.fr/‎',
+		'http://tupuessouslesbras.fr/‎',
+		'http://mangetescrottesdenez.fr/‎',
+		'http://jtepourristesstats.fr/‎',
+		'http://ontecompissevigoureusement.com/‎',
+		'http://lepoingleveetlemajeuraussi.com/‎',
+	));
+}
+function file_curl_contents($url){
+	$ch = curl_init();
+	curl_setopt($ch, CURLOPT_HTTPHEADER, array('Accept-Charset: UTF-8'));
+	curl_setopt($ch, CURLOPT_HEADER, 0);
+	curl_setopt($ch, CURLOPT_SSL_VERIFYPEER,  FALSE);
+	curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+	curl_setopt($ch, CURLOPT_URL, $url);
+	if (!ini_get("safe_mode") && !ini_get('open_basedir') ) {curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);}
+	curl_setopt($ch, CURLOPT_MAXREDIRS, 10);
+	curl_setopt($ch, CURLOPT_REFERER, random_referer());// notez le referer "custom"
+
+	$data = curl_exec($ch);
+	$response_headers = curl_getinfo($ch);
+
+	// Google seems to be sending ISO encoded page + htmlentities, why??
+	if($response_headers['content_type'] == 'text/html; charset=ISO-8859-1') $data = html_entity_decode(iconv('ISO-8859-1', 'UTF-8//TRANSLIT', $data)); 
+	
+	# $data = curl_exec($ch);
+
+	curl_close($ch);
+
+	return $data;
+}
+function add_search_engine(){
+	if(!is_file('googol.xml')){
+		file_put_contents('googol.xml', '<OpenSearchDescription xmlns="http://a9.com/-/spec/opensearch/1.1/"
+		  xmlns:moz="http://www.mozilla.org/2006/browser/search/">
+		  <ShortName>Googol</ShortName>
+		  <Description>'.msg('Googol - Google without lies').'</Description>
+		  <InputEncoding>UTF-8</InputEncoding>
+		  <Image width="32" height="32">data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAABCFJREFUeNrEV21MW2UUfm7v7QcwWqj9YBQyEAdqwBGGY3xkQRlLRjLnsmnUOOOSJYsmxvhDo/7VRH+YaPxhYqLRiAkuccbh5jbFRZgR3IbpwphG0wxaSgOUXgot7W177/V9L/DDrLv3bcK2kzy97e15zz3vOc85573c4bfOY112ruNuyATBKP0iQNVufETwKu6ufElwTFBVtf0ePJzKiwQniQNoLmRVYyUHT5kNT3f7YLbatHtkE4gvr+LsWATT82kEoszm2gVFVZk0K+0qnulwoM7nAG82gxfM2n2OM5HfAjzeYhw76EIuk8HV6zP4engBYoozMmuhKTB8eJ0LeHlvGc74VzHwexyz8f//73NweNBnRU9rJWq3VaBzVwNqKkrwdv9NpHP6Thg6QHfe12TDO6dFiKv5dWaWVIIUhiYDeK4rhid7m+D2utDkm8blKUXXvommQA9HO4rw1Wgai0l9vQ2cGotBSiaQTafwz5xsqC+oOg4+QEIfJrtbTLCTtLyIQyqxjIGLIaZ1gqLcPgVVTko2CxQlxexAx3YbRv4M46cJtjW6HOA4DntaqiApPC5eEzEj6uezs94Kj8OCjy8sMTusG4EbYYlEQMChfU040C1BzmZJzed3wmTiwfE8hq8GYeVFpLKsDuiQIBgDBkcCOLyvEcX2MvC8QMNyW31VUdDbaSNlCbzRH2JMgaJfhv3DIubFcRx5rAZljhItLXkjQJyzFhVrTcphL4aRXaYUbMg5f5Jg0lDv2T0ezdFvfw1CYXaAsRWziN2SwXdDf+FHf2JzSJhPdtaYsbvBjrb6LWuVQsgXislaCn6biOLMeLwge0yzYENe6fPi8UercWUygte+CCK6osBVasKJ/T50tdaiurIcgYifVE+W2aaJMpcFT7U7sL/7ISQlBR9+P4OFeE67T6/vfjONqdA8vF433jvRgupyDqx2TQr5MIKzBDja97A2/3+4NIVEWr5FZ+DnAGQ5h1KnG4c6PGCxS2Gi5WKEtu0lsG0p1UK2nJDy6oz9TQaQlNac7GmrAYtdCiYOVDhthGQ8NnTzrUlKZLqRCNA+QQl5H+FodEVlaUSKoVIimdUeSjshdUZvjSzLWIonCTdkRhISw0b4N5wgRy0JJjIXdjVuzatTZFnrhlkphV/+mAaLXQqmKrgeTCOysKql4f7areh5xH6LTm9zuTaQZkNhnBqZZa4C3U74wfNubKtyacSyWbNYic5rUXj9hRZymhnHkH9t7O7d4cDxJ+oRCUfw5qfXMLcsM/cBrvnIZy+R6yesCw7udqK1wY0ddXbkshJlJObEDM5dmcPg5aVCu/f7AgqcBadHFzVslhTUiu+AZOh54OY9dOAGLcPzBJ+zls0m4izBSXLG0lJwnL4oEnTRxneHdx1bfzUfpD/+E2AAqmeV253DYKAAAAAASUVORK5CYII=</Image>
+		  <Url type="text/html" method="get" template="'.RACINE.'">
+		  <Param name="q" value="{searchTerms}"/>
+		  </Url>
+		  <moz:SearchForm>'.RACINE.'</moz:SearchForm> 
+		</OpenSearchDescription>');
+	}
+}
+function parse_query($query,$start=0){
+	global $mode,$filtre;
+	if ($mode=='web'){ 
+		$page=file_curl_contents(URL.str_replace(' ','+',urlencode($query)).'&start='.$start.'&num=100');
+		# var_dump(my_htmlspecialchars($page));
+		if (!$page){return false;}
+		preg_match_all(REGEX_WEB, $page, $r);
+		preg_match_all(REGEX_PAGES,$page,$p);
+		$p=count($p[2]);
+
+		$retour=array(
+			'links'=>$r[1],
+			'titles'=>$r[2],
+			'descriptions'=>array_map('strip_tags',$r[3]),
+			'nb_pages'=>$p,
+			'current_page'=>$start,
+			'query'=>$query,
+			'mode'=>$mode
+			);
+		return $retour;
+	}elseif ($mode=='images'){ 
+		if (!empty($filtre)){$f='&tbs='.$filtre;}else{$f='';}
+		$page=file_curl_contents(URL.str_replace(' ','+',urlencode($query)).URLIMG.$f.'&start='.$start);			
+		if (!$page){return false;}
+		preg_match_all(REGEX_IMG,$page,$r);
+		preg_match_all(REGEX_PAGES,$page,$p);
+		preg_match_all(REGEX_THMBS,$page,$t);
+		$p=count($p[2]);
+		$retour=array(
+			'site'=>$r[2],
+			'links'=>$r[1],
+			'h'=>$r[3],
+			'w'=>$r[4],
+			'sz'=>$r[5],
+			'thumbs'=>$t[3],
+			'thumbs_w'=>$t[2],
+			'thumbs_h'=>$t[1],
+			'nb_pages'=>$p,
+			'current_page'=>$start,
+			'query'=>$query,
+			'mode'=>$mode
+			);
+		return $retour;		
+	}elseif($mode=="videos"){
+		$page=file_curl_contents(URL.str_replace(' ','+',urlencode($query)).URLVID.'&start='.$start);
+		if (!$page){return false;}
+		preg_match_all(REGEX_VID,$page,$r);
+		preg_match_all(REGEX_PAGES,$page,$p);
+		$p=count($p[2]);
+		$retour=array(
+			'site'=>$r[5],
+			'titre'=>$r[4],
+			'links'=>array_map('urldecode', $r[3]),
+			'description'=>array_map('strip_tags',$r[6]),
+			'thumbs'=>$r[1],
+			'thumbs_w'=>$r[2],
+			'nb_pages'=>$p,
+			'current_page'=>$start,
+			'query'=>$query,
+			'mode'=>$mode
+			);
+		return $retour;		
+	}
+}
+
+function render_query($array){
+	global $start,$langue,$mode,$couleur,$taille;
+	if (!is_array($array)||count($array['links'])==0){echo '<div class="noresult"> '.msg('no results for').' <em>'.my_htmlspecialchars($array['query']).'</em> </div>';return false;}
+	
+	if ($mode=='web'){
+		echo '<ol start="'.$start.'">';
+		$nbresultsperpage=100;
+		$filtre='';
+		foreach ($array['links'] as $nb => $link){
+			$r=str_replace('#link',urldecode($link),TPL);
+			$r=str_replace('#title',$array['titles'][$nb],$r);
+			$d=str_replace('<br>','',$array['descriptions'][$nb]);
+			$d=str_replace('<br/>','',$d);
+			$r=str_replace('#description',$d,$r);
+			if (preg_match('#http://(.*?)/#',$link,$domaine)){
+				$domaine='<a target="_blank" class="wot-exclude wot" href="'.WOT_URL.$domaine[1].'" title="View scorecard"> </a>';
+				$r=str_replace('#wot',$domaine,$r);
+			}else{$r=str_replace('#wot','',$r);}
+
+			echo $r;
+		}
+		echo '</ol>';
+	}elseif ($mode=='images'){
+		$nbresultsperpage=20;
+		$filtre='&couleur='.$couleur.'&taille='.$taille;
+		foreach ($array['links'] as $nb => $link){
+			$r=str_replace('#link',$link,TPLIMG);
+			$r=str_replace('#SZ',$array['sz'][$nb],$r);
+			$r=str_replace('#H',$array['h'][$nb],$r);
+			$r=str_replace('#W',$array['w'][$nb],$r);
+			$r=str_replace('#site',$array['site'][$nb],$r);
+			if (!USE_GOOGLE_THUMBS){
+				$repl='<img src="'.grab_google_thumb($array['thumbs'][$nb]).'" width="'.$array['thumbs_w'][$nb].'" height="'.$array['thumbs_h'][$nb].'"/>';
+			}else if (USE_GOOGLE_THUMBS){
+				$repl='<img src="'.$array['thumbs'][$nb].'" width="'.$array['thumbs_w'][$nb].'" height="'.$array['thumbs_h'][$nb].'"/>';
+			}				
+			$r=str_replace('#thumbs',$repl,$r);
+			echo $r;
+		}	
+	}elseif($mode='videos'){ 
+		$nbresultsperpage=10;
+		$filtre='';
+		foreach ($array['links'] as $nb => $link){
+			$array['description'][$nb]=link2YoutubeUser($array['description'][$nb],$link);
+			$r=str_replace('#link',$link,TPLVID);
+			$r=str_replace('#titre',$array['titre'][$nb],$r);
+			$r=str_replace('#description',$array['description'][$nb],$r);
+			$r=str_replace('#site',$array['site'][$nb],$r);
+			if (!USE_GOOGLE_THUMBS){
+				$repl='<img src="'.grab_google_thumb($array['thumbs'][$nb]).'" width="'.$array['thumbs_w'][$nb].'" height="'.round($array['thumbs_w'][$nb]/1.33).'"/>';
+			}else if (USE_GOOGLE_THUMBS){
+				$repl='<img src="'.$array['thumbs'][$nb].'" width="'.$array['thumbs_w'][$nb].'" height="'.round($array['thumbs_w'][$nb]/1.33).'"/>';
+			}				
+			$r=str_replace('#thumbs',$repl,$r);
+			echo $r;
+		}
+
 	}
 
-	if (isset($_GET['lang'])){$langue=my_htmlspecialchars($_GET['lang']);}else{$langue=my_htmlspecialchars(lang());}
-	clear_cache();// vire les thumbs de plus de trois minutes
-	define('LANGUAGE',$langue);
-	define('RACINE','http://'.$_SERVER['SERVER_NAME']);
-	define('USE_WEB_OF_TRUST',true);
-	define('WOT_URL','http://www.mywot.com/scorecard/');
-	define('REGEX_WEB','#(?<=<h3 class="r"><a href="/url\?q=)([^&]+).*?>(.*?)</a>.*?(?<=<span class="st">)(.*?)(?=</span>)#');
-	define('REGEX_PAGES','#&start=([0-9]+)|&start=([0-9]+)#');
-	define('REGEX_IMG','#(?<=imgurl=)(.*?)&imgrefurl=(.*?)&.*?h=([0-9]+)&w=([0-9]+)&sz=([0-9]+)|(?<=imgurl=)(.*?)&imgrefurl=(.*?)&.*?h=([0-9]+)&w=([0-9]+)&sz=([0-9]+)#');
-	define('REGEX_THMBS','#<img.*?height="([0-9]+)".*?width="([0-9]+)".*?src="([^"]+)"#');
-
-	define('REGEX_VID','#(?:<img.*?src="([^"]+)".*?width="([0-9]+)".*?)?<h3 class="r">[^<]*<a href="/url\?q=(.*?)(?:&|&).*?">(.*?)</a>.*?<cite[^>]*>(.*?)</cite>.*?<span class="(?:st|f)">(.*?)(?:</span></td>|</span><br></?div>)#');
-	define('REGEX_VID_THMBS','#<img.*?src="([^"]+)".*?width="([0-9]+)"#');
-	define('TPL','<li class="result"><a rel="noreferrer" href="#link"><h3 class="title">#title</h3>#link</a>#wot<p class="description">#description</p></li>');
-	define('TPLIMG','<div class="image" ><p><a rel="noreferrer" href="#link" title="#link">#thumbs</a></p><p class="description">#W x #H (#SZ ko)<a class="source" href="#site" title="#site"> &#9658;</a></p></div>');
-	define('TPLVID','<div class="video" ><h3><a rel="noreferrer" href="#link" title="#link">#titre</a></h3><a class="thumb" rel="noreferrer" href="#link" title="#link">#thumbs</a><p class="site">#site</p><p class="description">#description</p></div>');
-	define('LOGO1','<a href="'.RACINE.'"><em class="g">G</em><em class="o1">o</em>');
-	define('LOGO2','<em class="o2">o</em><em class="g">g</em><em class="o1">o</em><em class="l">l</em></a>');
-
-	define('SAFESEARCH_ON','&safe=on');
-	define('SAFESEARCH_IMAGESONLY','&safe=images');
-	define('SAFESEARCH_OFF','&safe=off');
-	define('SAFESEARCH_LEVEL',SAFESEARCH_OFF);// SAFESEARCH_ON, SAFESEARCH_IMAGESONLY, SAFESEARCH_OFF
-
-	define('URL','https://www.google.com/search?hl='.LANGUAGE.SAFESEARCH_LEVEL.'&id=hp&q=');
-	define('URLIMG','&tbm=isch&biw=1920&bih=1075');
-	define('URLVID','&tbm=vid');
-	define('VERSION','v1.5');
-	define('USE_GOOGLE_THUMBS',false);
-	define('THEME','style_google.css');
-
-	if (!USE_GOOGLE_THUMBS){ 
-		session_start();
-		if (!isset($_SESSION['ID'])){$_SESSION['ID']=uniqid();}
-		define('UNIQUE_THUMBS_PATH','thumbs/'.$_SESSION['ID']);
-		if (!is_dir('thumbs')){mkdir('thumbs');}// crée le dossier thumbs si nécessaire
-	}
-	$lang['fr']=array(
-		'previous'=>my_htmlspecialchars('Page précédente'),
-		'next'=>'Page suivante',
-		'The thumbnails are temporarly stored in this server to hide your ip from Google…'=>my_htmlspecialchars('les miniatures sont temporairement récupérées sur ce serveur, google n\'a pas votre IP…'),
-		'Search anonymously on Google (direct links, fake referer)'=>my_htmlspecialchars('Rechercher anonymement sur Google (liens directs et referrer caché)'),
-		'Free and open source (please keep a link to warriordudimanche.net for the author ^^)'=>my_htmlspecialchars('Libre et open source, merci de laisser un lien vers warriordudimanche.net pour citer l\'auteur ;)'),
-		'Googol - google without lies'=>'Googol - google sans mensonge',
-		'on GitHub'=>'sur GitHub',
-		'no results for'=>my_htmlspecialchars('pas de résultat pour '),
-		'by'=>'par',
-		'search '=>'recherche ',
-		'Videos'=>my_htmlspecialchars('Vidéos'),
-		'Search'=>'Rechercher',
-		'Otherwise, use a real Search engine !'=>'Sinon, utilisez un vrai moteur de recherche !',
-		'Filter on'=>my_htmlspecialchars('Filtre activé'),
-		'Filter off'=>my_htmlspecialchars('Filtre désactivé'),
-		'Filter images only'=>my_htmlspecialchars('Filtre activé sur les images'),
-		'red'=>'rouge',
-		'yellow'=>'jaune',
-		'green'=>'vert',
-		'white'=>'blanc',
-		'gray'=>'gris',
-		'teal'=>'sarcelle',
-		'black'=>'noir',
-		'pink'=>'rose',
-		'blue'=>'bleu',
-		'brown'=>'marron',
-		'Black_and_white'=>'Noir_et_blanc',
-		'Color'=>'couleur',
-		'all colors'=>'toutes les couleurs',
-		'all sizes'=>'toutes les tailles',
-		'Select a color'=>'Filtrer par couleur',
-		'Select a size'=>'Filtrer par size',
-		'Big'=>'Grande',
-		'Medium'=>'Moyenne',
-		'Icon'=>'Petite',
-		);
-
-
-	#######################################################################
-	## Fonctions
-	#######################################################################
-	function aff($a,$stop=true,$line){echo 'Arret a la ligne '.$line.' du fichier '.__FILE__.'<pre>';var_dump($a);echo '</pre>';if ($stop){exit();}}
-	function msg($m){global $lang;if(isset($lang[LANGUAGE][$m])){return $lang[LANGUAGE][$m];}else{return $m;}}
-	function lang($default='fr'){if (isset($_SERVER['HTTP_ACCEPT_LANGUAGE'])){$l=explode(',',$_SERVER['HTTP_ACCEPT_LANGUAGE']);return substr($l[0],0,2);}else{return $default;}}
-	function return_safe_search_level(){
-		if (SAFESEARCH_LEVEL==SAFESEARCH_ON){return '<b class="ss_on">'.msg('Filter on').'</b>';}
-		if (SAFESEARCH_LEVEL==SAFESEARCH_OFF){return '<b class="ss_off">'.msg('Filter off').'</b>';}
-		if (SAFESEARCH_LEVEL==SAFESEARCH_IMAGESONLY){return '<b class="ss_images">'.msg('Filter images only').'</b>';}
-	}
-	function Random_referer(){
-		return array_rand(array(
-			'http://oudanstoncul.com.free.fr/‎',
-			'http://googlearretedenousfliquer.fr/‎',
-			'http://stopspyingme.fr/‎',
-			'http://spyyourassfuckinggoogle.fr/‎',
-			'http://dontfuckinglookatme.fr/‎',
-			'http://matemonculgoogle.fr/‎',
-			'http://auxarmescitoyens.fr/‎',
-			'http://jetlametsavecdugravier.con/‎',
-			'http://lesdeuxpiedsdanstagueule.fr/‎',
-			'http://moncoudedanstabouche.con/‎',
-			'http://monpieddanston.uk/‎',
-			'http://bienfaitpourvosgueul.es/‎',
-			'http://pandanstesdents.fr/‎',
-			'http://tupuessouslesbras.fr/‎',
-			'http://mangetescrottesdenez.fr/‎',
-			'http://jtepourristesstats.fr/‎',
-			'http://ontecompissevigoureusement.com/‎',
-			'http://lepoingleveetlemajeuraussi.com/‎',
-		));
-	}
-	function file_curl_contents($url){
-		$ch = curl_init();
-		curl_setopt($ch, CURLOPT_HTTPHEADER, array('Accept-Charset: UTF-8'));
-		curl_setopt($ch, CURLOPT_HEADER, 0);
-		curl_setopt($ch, CURLOPT_SSL_VERIFYPEER,  FALSE);
-		curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
-		curl_setopt($ch, CURLOPT_URL, $url);
-		if (!ini_get("safe_mode") && !ini_get('open_basedir') ) {curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);}
-		curl_setopt($ch, CURLOPT_MAXREDIRS, 10);
-		curl_setopt($ch, CURLOPT_REFERER, random_referer());// notez le referer "custom"
-
-		$data = curl_exec($ch);
-		$response_headers = curl_getinfo($ch);
-
-		// Google seems to be sending ISO encoded page + htmlentities, why??
-		if($response_headers['content_type'] == 'text/html; charset=ISO-8859-1') $data = html_entity_decode(iconv('ISO-8859-1', 'UTF-8//TRANSLIT', $data)); 
+	if($array['nb_pages'] != 0){
+		echo '<hr/><p class="footerlogo">'.LOGO1.str_repeat('<em class="o2">o</em>', $array['nb_pages']-1).LOGO2.'</p><div class="pagination">';
+		if ($start>0){echo '<a class="previous" title="'.msg('previous').'" href="?q='.urlencode($array['query']).'&mod='.$mode.'&start='.($start-$nbresultsperpage).'&lang='.$langue.$filtre.'">&#9668;</a>';}
+		for ($i=0;$i<$array['nb_pages']-1;$i++){
+			if ($i*$nbresultsperpage==$array['current_page']){echo '<em>'.($i+1).'</em>';}
+			else{echo '<a href="?q='.urlencode($array['query']).'&mod='.$mode.'&start='.($i*$nbresultsperpage).'&lang='.$langue.$filtre.'">'.($i+1).'</a>';}
+		}
+		if ($start<($array['nb_pages']-2)*$nbresultsperpage){echo '<a class="next" title="'.msg('next').'" href="?q='.urlencode($array['query']).'&mod='.$mode.'&start='.($start+$nbresultsperpage).'&lang='.$langue.$filtre.'">&#9658;</a>';}
 		
-		# $data = curl_exec($ch);
-
-		curl_close($ch);
-
-		return $data;
+		echo  '</div>';
 	}
-	function add_search_engine(){
-		if(!is_file('googol.xml')){
-			file_put_contents('googol.xml', '<OpenSearchDescription xmlns="http://a9.com/-/spec/opensearch/1.1/"
-			  xmlns:moz="http://www.mozilla.org/2006/browser/search/">
-			  <ShortName>Googol</ShortName>
-			  <Description>'.msg('Googol - google without lies').'</Description>
-			  <InputEncoding>UTF-8</InputEncoding>
-			  <Image width="32" height="32">data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAABCFJREFUeNrEV21MW2UUfm7v7QcwWqj9YBQyEAdqwBGGY3xkQRlLRjLnsmnUOOOSJYsmxvhDo/7VRH+YaPxhYqLRiAkuccbh5jbFRZgR3IbpwphG0wxaSgOUXgot7W177/V9L/DDrLv3bcK2kzy97e15zz3vOc85573c4bfOY112ruNuyATBKP0iQNVufETwKu6ufElwTFBVtf0ePJzKiwQniQNoLmRVYyUHT5kNT3f7YLbatHtkE4gvr+LsWATT82kEoszm2gVFVZk0K+0qnulwoM7nAG82gxfM2n2OM5HfAjzeYhw76EIuk8HV6zP4engBYoozMmuhKTB8eJ0LeHlvGc74VzHwexyz8f//73NweNBnRU9rJWq3VaBzVwNqKkrwdv9NpHP6Thg6QHfe12TDO6dFiKv5dWaWVIIUhiYDeK4rhid7m+D2utDkm8blKUXXvommQA9HO4rw1Wgai0l9vQ2cGotBSiaQTafwz5xsqC+oOg4+QEIfJrtbTLCTtLyIQyqxjIGLIaZ1gqLcPgVVTko2CxQlxexAx3YbRv4M46cJtjW6HOA4DntaqiApPC5eEzEj6uezs94Kj8OCjy8sMTusG4EbYYlEQMChfU040C1BzmZJzed3wmTiwfE8hq8GYeVFpLKsDuiQIBgDBkcCOLyvEcX2MvC8QMNyW31VUdDbaSNlCbzRH2JMgaJfhv3DIubFcRx5rAZljhItLXkjQJyzFhVrTcphL4aRXaYUbMg5f5Jg0lDv2T0ezdFvfw1CYXaAsRWziN2SwXdDf+FHf2JzSJhPdtaYsbvBjrb6LWuVQsgXislaCn6biOLMeLwge0yzYENe6fPi8UercWUygte+CCK6osBVasKJ/T50tdaiurIcgYifVE+W2aaJMpcFT7U7sL/7ISQlBR9+P4OFeE67T6/vfjONqdA8vF433jvRgupyDqx2TQr5MIKzBDja97A2/3+4NIVEWr5FZ+DnAGQ5h1KnG4c6PGCxS2Gi5WKEtu0lsG0p1UK2nJDy6oz9TQaQlNac7GmrAYtdCiYOVDhthGQ8NnTzrUlKZLqRCNA+QQl5H+FodEVlaUSKoVIimdUeSjshdUZvjSzLWIonCTdkRhISw0b4N5wgRy0JJjIXdjVuzatTZFnrhlkphV/+mAaLXQqmKrgeTCOysKql4f7areh5xH6LTm9zuTaQZkNhnBqZZa4C3U74wfNubKtyacSyWbNYic5rUXj9hRZymhnHkH9t7O7d4cDxJ+oRCUfw5qfXMLcsM/cBrvnIZy+R6yesCw7udqK1wY0ddXbkshJlJObEDM5dmcPg5aVCu/f7AgqcBadHFzVslhTUiu+AZOh54OY9dOAGLcPzBJ+zls0m4izBSXLG0lJwnL4oEnTRxneHdx1bfzUfpD/+E2AAqmeV253DYKAAAAAASUVORK5CYII=</Image>
-			  <Url type="text/html" method="get" template="'.RACINE.'">
-			  <Param name="q" value="{searchTerms}"/>
-			  </Url>
-			  <moz:SearchForm>'.RACINE.'</moz:SearchForm> 
-			</OpenSearchDescription>');
-		}
-	}
-	function parse_query($query,$start=0){
-		global $mode,$filtre;
-		if ($mode=='web'){ 
-			$page=file_curl_contents(URL.str_replace(' ','+',urlencode($query)).'&start='.$start.'&num=100');
-			# var_dump(my_htmlspecialchars($page));
-			if (!$page){return false;}
-			preg_match_all(REGEX_WEB, $page, $r);
-			preg_match_all(REGEX_PAGES,$page,$p);
-			$p=count($p[2]);
+}
+function grab_google_thumb($link){
+	$local = 'thumbs/'.md5($link).'.jpg';
 
-			$retour=array(
-				'links'=>$r[1],
-				'titles'=>$r[2],
-				'descriptions'=>array_map('strip_tags',$r[3]),
-				'nb_pages'=>$p,
-				'current_page'=>$start,
-				'query'=>$query,
-				'mode'=>$mode
-				);
-			return $retour;
-		}elseif ($mode=='images'){ 
-			if (!empty($filtre)){$f='&tbs='.$filtre;}else{$f='';}
-			$page=file_curl_contents(URL.str_replace(' ','+',urlencode($query)).URLIMG.$f.'&start='.$start);			
-			if (!$page){return false;}
-			preg_match_all(REGEX_IMG,$page,$r);
-			preg_match_all(REGEX_PAGES,$page,$p);
-			preg_match_all(REGEX_THMBS,$page,$t);
-			$p=count($p[2]);
-			$retour=array(
-				'site'=>$r[2],
-				'links'=>$r[1],
-				'h'=>$r[3],
-				'w'=>$r[4],
-				'sz'=>$r[5],
-				'thumbs'=>$t[3],
-				'thumbs_w'=>$t[2],
-				'thumbs_h'=>$t[1],
-				'nb_pages'=>$p,
-				'current_page'=>$start,
-				'query'=>$query,
-				'mode'=>$mode
-				);
-			return $retour;		
-		}elseif($mode=="videos"){
-			$page=file_curl_contents(URL.str_replace(' ','+',urlencode($query)).URLVID.'&start='.$start);
-			if (!$page){return false;}
-			preg_match_all(REGEX_VID,$page,$r);
-			preg_match_all(REGEX_PAGES,$page,$p);
-			$p=count($p[2]);
-			$retour=array(
-				'site'=>$r[5],
-				'titre'=>$r[4],
-				'links'=>array_map('urldecode', $r[3]),
-				'description'=>array_map('strip_tags',$r[6]),
-				'thumbs'=>$r[1],
-				'thumbs_w'=>$r[2],
-				'nb_pages'=>$p,
-				'current_page'=>$start,
-				'query'=>$query,
-				'mode'=>$mode
-				);
-			return $retour;		
-		}
+	if(is_file($local)) return $local;
+
+	if($thumb = file_curl_contents($link))
+	{
+		file_put_contents($local, $thumb);
+		return $local;
 	}
 
-	function render_query($array){
-		global $start,$langue,$mode,$couleur,$taille;
-		if (!is_array($array)||count($array['links'])==0){echo '<div class="noresult"> '.msg('no results for').' <em>'.my_htmlspecialchars($array['query']).'</em> </div>';return false;}
-		
-		if ($mode=='web'){
-			echo '<ol start="'.$start.'">';
-			$nbresultsperpage=100;
-			$filtre='';
-			foreach ($array['links'] as $nb => $link){
-				$r=str_replace('#link',urldecode($link),TPL);
-				$r=str_replace('#title',$array['titles'][$nb],$r);
-				$d=str_replace('<br>','',$array['descriptions'][$nb]);
-				$d=str_replace('<br/>','',$d);
-				$r=str_replace('#description',$d,$r);
-				if (preg_match('#http://(.*?)/#',$link,$domaine)){
-					$domaine='<a class="wot-exclude wot" href="'.WOT_URL.$domaine[1].'" title="View scorecard"> </a>';
-					$r=str_replace('#wot',$domaine,$r);
-				}else{$r=str_replace('#wot','',$r);}
-
-				echo $r;
-			}
-			echo '</ol>';
-		}elseif ($mode=='images'){
-			$nbresultsperpage=20;
-			$filtre='&couleur='.$couleur.'&taille='.$taille;
-			foreach ($array['links'] as $nb => $link){
-				$r=str_replace('#link',$link,TPLIMG);
-				$r=str_replace('#SZ',$array['sz'][$nb],$r);
-				$r=str_replace('#H',$array['h'][$nb],$r);
-				$r=str_replace('#W',$array['w'][$nb],$r);
-				$r=str_replace('#site',$array['site'][$nb],$r);
-				if (!USE_GOOGLE_THUMBS){
-					$repl='<img src="'.grab_google_thumb($array['thumbs'][$nb]).'" width="'.$array['thumbs_w'][$nb].'" height="'.$array['thumbs_h'][$nb].'"/>';
-				}else if (USE_GOOGLE_THUMBS){
-					$repl='<img src="'.$array['thumbs'][$nb].'" width="'.$array['thumbs_w'][$nb].'" height="'.$array['thumbs_h'][$nb].'"/>';
-				}				
-				$r=str_replace('#thumbs',$repl,$r);
-				echo $r;
-			}	
-		}elseif($mode='videos'){ 
-			$nbresultsperpage=10;
-			$filtre='';
-			foreach ($array['links'] as $nb => $link){
-				$array['description'][$nb]=link2YoutubeUser($array['description'][$nb],$link);
-				$r=str_replace('#link',$link,TPLVID);
-				$r=str_replace('#titre',$array['titre'][$nb],$r);
-				$r=str_replace('#description',$array['description'][$nb],$r);
-				$r=str_replace('#site',$array['site'][$nb],$r);
-				if (!USE_GOOGLE_THUMBS){
-					$repl='<img src="'.grab_google_thumb($array['thumbs'][$nb]).'" width="'.$array['thumbs_w'][$nb].'" height="'.round($array['thumbs_w'][$nb]/1.33).'"/>';
-				}else if (USE_GOOGLE_THUMBS){
-					$repl='<img src="'.$array['thumbs'][$nb].'" width="'.$array['thumbs_w'][$nb].'" height="'.round($array['thumbs_w'][$nb]/1.33).'"/>';
-				}				
-				$r=str_replace('#thumbs',$repl,$r);
-				echo $r;
-			}
-
-		}
-
-		if($array['nb_pages'] != 0){
-			echo '<hr/><p class="footerlogo">'.LOGO1.str_repeat('<em class="o2">o</em>', $array['nb_pages']-1).LOGO2.'</p><div class="pagination">';
-			if ($start>0){echo '<a class="previous" title="'.msg('previous').'" href="?q='.urlencode($array['query']).'&mod='.$mode.'&start='.($start-$nbresultsperpage).'&lang='.$langue.$filtre.'">&#9668;</a>';}
-			for ($i=0;$i<$array['nb_pages']-1;$i++){
-				if ($i*$nbresultsperpage==$array['current_page']){echo '<em>'.($i+1).'</em>';}
-				else{echo '<a href="?q='.urlencode($array['query']).'&mod='.$mode.'&start='.($i*$nbresultsperpage).'&lang='.$langue.$filtre.'">'.($i+1).'</a>';}
-			}
-			if ($start<($array['nb_pages']-2)*$nbresultsperpage){echo '<a class="next" title="'.msg('next').'" href="?q='.urlencode($array['query']).'&mod='.$mode.'&start='.($start+$nbresultsperpage).'&lang='.$langue.$filtre.'">&#9658;</a>';}
-			
-			echo  '</div>';
-		}
-	}
-	function grab_google_thumb($link){
-		$local = 'thumbs/'.md5($link).'.jpg';
-
-		if(is_file($local)) return $local;
-
-		if($thumb = file_curl_contents($link))
-		{
-			file_put_contents($local, $thumb);
-			return $local;
-		}
-
-		return $link;
-	}
-	function link2YoutubeUser($desc,$link){
-		if (stristr($link,'youtube.com')){
-			$desc=preg_replace('#([Aa]jout[^ ]+ par )([^<]+)#','$1<a rel="noreferrer" href="http://www.youtube.com/user/$2?feature=watch">$2</a>',$desc);
-		};
-		return $desc;
-	}
-	function clear_cache($delay=180){
-		$fs=glob('thumbs/*');
-		if(!empty($fs)){
-			foreach ($fs as $file){
-				if (@date('U')-@date(filemtime($file))>$delay){
-					unlink ($file);
-				}
+	return $link;
+}
+function link2YoutubeUser($desc,$link){
+	if (stristr($link,'youtube.com')){
+		$desc=preg_replace('#([Aa]jout[^ ]+ par )([^<]+)#','$1<a rel="noreferrer" href="http://www.youtube.com/user/$2?feature=watch">$2</a>',$desc);
+	};
+	return $desc;
+}
+function clear_cache($delay=180){
+	$fs=glob('thumbs/*');
+	if(!empty($fs)){
+		foreach ($fs as $file){
+			if (@date('U')-@date(filemtime($file))>$delay){
+				unlink ($file);
 			}
 		}
 	}
-	function is_active($first,$second){
-		if ($first==$second){
-			echo 'active';
-		}else{
-			echo '';
-		}
-	}
-		
-
-	#######################################################################
-	## Gestion GET
-	#######################################################################
-	if (isset($_GET['mod'])){$mode=my_htmlspecialchars($_GET['mod']);}else{$mode='web';}
-	if (isset($_GET['start'])){$start=my_htmlspecialchars($_GET['start']);}else{$start='';}
-	if (!empty($_GET['couleur'])&&empty($_GET['taille'])){$filtre=$couleur=my_htmlspecialchars($_GET['couleur']);$taille='';}
-	elseif (!empty($_GET['taille'])&&empty($_GET['couleur'])){$filtre=$taille=my_htmlspecialchars($_GET['taille']);$couleur='';}
-	elseif (!empty($_GET['taille'])&&!empty($_GET['couleur'])){$taille=my_htmlspecialchars($_GET['taille']);$couleur=my_htmlspecialchars($_GET['couleur']);$filtre=$couleur.','.$taille;}
-	else{$filtre=$taille=$couleur='';}
-	if (isset($_GET['q'])){
-		$q_raw=$_GET['q'];
-		$q_txt=my_htmlspecialchars($_GET['q']);
-		$title='Googol '.msg('search ').$q_txt;
+}
+function is_active($first,$second){
+	if ($first==$second){
+		echo 'active';
 	}else{
-		$q_txt=$q_raw='';$title=msg('Googol - google without lies');
+		echo '';
 	}
+}
+	
+#######################################################################
+## Gestion GET
+#######################################################################
+if (isset($_GET['mod'])){$mode=my_htmlspecialchars($_GET['mod']);}else{$mode='web';}
+if (isset($_GET['start'])){$start=my_htmlspecialchars($_GET['start']);}else{$start='';}
+if (!empty($_GET['couleur'])&&empty($_GET['taille'])){$filtre=$couleur=my_htmlspecialchars($_GET['couleur']);$taille='';}
+elseif (!empty($_GET['taille'])&&empty($_GET['couleur'])){$filtre=$taille=my_htmlspecialchars($_GET['taille']);$couleur='';}
+elseif (!empty($_GET['taille'])&&!empty($_GET['couleur'])){$taille=my_htmlspecialchars($_GET['taille']);$couleur=my_htmlspecialchars($_GET['couleur']);$filtre=$couleur.','.$taille;}
+else{$filtre=$taille=$couleur='';}
+if (isset($_GET['q'])){
+	$q_raw=$_GET['q'];
+	$q_txt=my_htmlspecialchars($_GET['q']);
+	$title='Googol '.msg('search ').$q_txt;
+}else{
+	$q_txt=$q_raw='';$title=msg('Googol - google without lies');
+}
 
 ?>
 <!DOCTYPE html>
@@ -353,30 +355,36 @@
 <head>
 	<title><?php echo $title;?> </title>
 	<meta charset="UTF-8" />
-		<meta name="viewport" content="width=device-width, initial-scale=1.0">
-	<?php if (is_file('favicon.png')){echo '<link rel="shortcut icon" href="favicon.png" /> ';}?>
-	<link rel="stylesheet" type="text/css" href="<?php echo THEME;?>"  media="screen" />
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<meta name="robots" content="all" />
+	<link rel="apple-touch-icon-precomposed" sizes="144x144" href="img/apple-touch-icon-144x144-precomposed.png">
+	<link rel="apple-touch-icon-precomposed" sizes="114x114" href="img/apple-touch-icon-114x114-precomposed.png">
+	<link rel="apple-touch-icon-precomposed" sizes="72x72" href="img/apple-touch-icon-72x72-precomposed.png">
+	<link rel="apple-touch-icon-precomposed" href="img/apple-touch-icon-precomposed.png">
+	<meta name="msapplication-TileColor" content="#ffffff">
+	<meta name="msapplication-TileImage" content="img/apple-touch-icon-144x144-precomposed.png">
+	<?php if (is_file('img/favicon.png')){echo '<link rel="shortcut icon" href="img/favicon.png" /> ';}?>
+	
+	<link rel="stylesheet" href="<?php echo THEME;?>" />
+	<link rel="stylesheet" href="css/magnific-popup.css" />
 	<link rel="search" type="application/opensearchdescription+xml" title="<?php echo msg('Googol - google without lies'); ?>" href="<?php echo RACINE;?>/googol.xml">
-
 	<!--[if IE]><script> document.createElement("article");document.createElement("aside");document.createElement("section");document.createElement("footer");</script> <![endif]-->
 </head>
 <body class="<?php echo $mode;?>">
 <header>
-	<p class="top">
-		<span class="version"> <?php echo my_htmlspecialchars(VERSION).' - '.return_safe_search_level(); ?> </span>
+	<div class="top">
 		<a class="<?php is_active(LANGUAGE,'fr'); ?>" href="?lang=fr">FR</a> 
-		<a class="<?php is_active(LANGUAGE,'en'); ?>" href="?lang=en">EN</a>
-		<a class="infos_icon nomobile">&copy;</a>
-		<span class="infos nomobile">
-			<a href="<?php echo RACINE;?>">Googol</a> <?php echo msg('by');?> 
-			<a href="http://warriordudimanche.net">Bronco - warriordudimanche.net</a> 
-			<a href="#" title="<?php echo msg('Free and open source (please keep a link to warriordudimanche.net for the author ^^)');?>"><em>Licence</em></a>  
-			<a href="https://github.com/broncowdd/googol" title="<?php echo msg('on GitHub');?>" class="github wot-exclude "> </a> <a href="http://flattr.com/thing/1319925/broncowddSnippetVamp-on-GitHub" target="_blank"><img src="http://images.warriordudimanche.net/flattr.png" alt="Flattr this" title="Flattr this" border="0" /></a>
-			<a href="http://duckduckgo.com" title="<?php echo msg('Otherwise, use a real Search engine !');?>" class="ddg wot-exclude "> </a>
-		</span>
-	</p>
-	
-	<form action="" method="get" >
+		<a class="<?php is_active(LANGUAGE,'en'); ?>" href="?lang=en">EN</a>  -  
+		<a class="popup-with-zoom-anim" href="#small-dialog" >Infos</a>
+		<div id="small-dialog" class="zoom-anim-dialog mfp-hide">
+			<h1 class="version"><?php echo LOGO1.LOGO2; ?> <?php echo my_htmlspecialchars(VERSION); ?></h1>
+			<p><a class="wot-exclude" href="#" title="<?php echo msg('Free and open source (please keep a link to warriordudimanche.net for the author ^^)');?>">Licence</a></p>
+			<p><?php echo msg('By');?> <a class="wot-exclude" href="http://warriordudimanche.net" title="warriordudimanche.net" target="_blank">Bronco</a> & <?php echo msg('modified by');?> <a class="wot-exclude" href="http://www.xoofoo.org" title="XooFoo.org" target="_blank">Krisfr</a></p>
+			<p><a href="https://github.com/broncowdd/googol" title="<?php echo msg('GitHub');?>" class="wot-exclude" target="_blank"><?php echo msg('Project on Github');?></a> - <a class="wot-exclude" href="http://flattr.com/thing/1319925/broncowddSnippetVamp-on-GitHub" target="_blank" title="Flattr.com"><?php echo msg('Give a beer to the author!');?></a></p>
+			<p><a class=" wot-exclude" href="http://duckduckgo.com" title="DuckDuckGo"><?php echo msg('Otherwise, use a real Search engine !');?></a></p>
+		</div>
+	</div>
+	<form id="formsearch" action="" method="get" >
 		<input type="hidden" name="lang" value="<?php echo LANGUAGE;?>"/>
 		<span class="logo"><?php echo LOGO1.LOGO2; ?></span>
 		<span>
@@ -384,8 +392,7 @@
 			<input type="submit" value="OK"/>
 		</span>
 		<?php
-
-			if ($mode!=''){echo '<input type="hidden" name="mod" value="'.$mode.'"/>';}
+			if ($mode!=''){echo '<br><input type="hidden" name="mod" value="'.$mode.'"/>';}
 			if ($mode=='images'){
 				// ajout des options de recherche d'images
 				// couleur
@@ -440,12 +447,7 @@
 				}
 				echo '</select>';
 			}
-
 		?>
-	
-
-
-
 	</form>
 	<p class="msg nomobile">
 		<?php 
@@ -453,7 +455,6 @@
 			if ($mode!='web'){	echo '<br/>'.msg('The thumbnails are temporarly stored in this server to hide your ip from Google…');	} 
 		?> 
 	</p>
-		
 </header>
 <nav>
 <?php 
@@ -462,17 +463,71 @@
 	else { echo '<li><a href="?q='.urlencode($q_raw).'&lang='.$langue.'">Web</a></li><li><a href="?q='.urlencode($q_raw).'&mod=images&lang='.$langue.'">Images</a></li><li class="active">'.msg('Videos').'</li>';}
 ?>	
 </nav>
-<aside>
+<section>
 	<?php if ($q_raw!=''){render_query(parse_query($q_raw,$start,$mode));} ?>
-</aside>
-
-<?php if(USE_WEB_OF_TRUST){echo '<script type="text/javascript" src="http://api.mywot.com/widgets/ratings.js"></script>';}?> 
-	<script language="javascript"> 
-		function change_class(classe) { 
-			var btn = document.getElementById("color_selection"); 
-			btn.className= classe; 
-		} 
-	</script>
+</section>
+<footer></footer>
+<script>
+	document.write('<script src=js/' +
+	('__proto__' in {} ? 'zepto' : 'jquery') +
+	'.min.js><\/script>')
+</script>
+<script src="js/jquery.magnific-popup.min.js"></script>
+<script>
+	$(document).ready(function() {
+		$('.zoom-gallery').magnificPopup({
+		  delegate: 'a',
+		  type: 'image',
+		  closeOnContentClick: false,
+		  closeBtnInside: false,
+		  mainClass: 'mfp-with-zoom mfp-img-mobile',
+		  image: {
+			verticalFit: true,
+			titleSrc: function(item) {
+			  return item.el.attr('title') + '<a class="image-source-link" href="'+item.el.attr('data-source')+'" target="_blank">image source</a>';
+			}
+		  },
+		  gallery: {
+			enabled: true
+		  },
+		  zoom: {
+			enabled: true,
+			duration: 300,
+			opener: function(element) {
+			  return element.find('img');
+			}
+		  }
+		});
+	  });
+	$(document).ready(function() {
+		$('.popup-youtube, .popup-vimeo, .popup-gmaps').magnificPopup({
+		  disableOn: 700,
+		  type: 'iframe',
+		  mainClass: 'mfp-fade',
+		  removalDelay: 160,
+		  preloader: false,
+		  fixedContentPos: false
+		});
+	  });
+	$(document).ready(function() {
+		$('.popup-with-zoom-anim').magnificPopup({
+		  type: 'inline',
+		  fixedContentPos: false,
+		  fixedBgPos: true,
+		  overflowY: 'auto',
+		  closeBtnInside: true,
+		  preloader: false,
+		  midClick: true,
+		  removalDelay: 300,
+		  mainClass: 'my-mfp-zoom-in'
+		});
+	  });
+	function change_class(classe) { 
+		var btn = document.getElementById("color_selection"); 
+		btn.className= classe; 
+	} 
+</script>
+<?php if(USE_WEB_OF_TRUST){echo '<script src="http://api.mywot.com/widgets/ratings.js"></script>';}?>
 </body>
 </html>
 <?php add_search_engine(); ?>
