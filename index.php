@@ -408,7 +408,7 @@ if (isset($_GET['q'])){
 		<input type="hidden" name="lang" value="<?php echo LANGUAGE;?>"/>
 		<span class="logo"><?php echo LOGO1.LOGO2; ?></span>
 		<span>
-			<input type="text" name="q" autofocus placeholder="<?php echo msg('Search'); ?>" value="<?php  echo $q_txt; ?>"/>
+			<input type="text" name="q" autofocus value="<?php  echo $q_txt; ?>"/>
 			<input type="submit" value="OK"/>
 		</span>
 		<?php
