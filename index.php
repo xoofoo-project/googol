@@ -11,7 +11,7 @@ function my_htmlspecialchars($str) {
 if (isset($_GET['lang'])){$langue=my_htmlspecialchars($_GET['lang']);}else{$langue=my_htmlspecialchars(lang());}
 clear_cache();// vire les thumbs de plus de trois minutes
 define('LANGUAGE',$langue);
-//define('RACINE','http://'.$_SERVER['SERVER_NAME']);
+//define('RACINE','http://'.$_SERVER['SERVER_NAME'].'/');
 define('RACINE','http://'.$_SERVER['HTTP_HOST'] );
 define('USE_WEB_OF_TRUST',true);
 define('WOT_URL','http://www.mywot.com/scorecard/');
@@ -38,7 +38,9 @@ define('URLIMG','&tbm=isch&biw=1920&bih=1075');
 define('URLVID','&tbm=vid');
 define('VERSION','v1.5');
 define('USE_GOOGLE_THUMBS',false);
-define('THEME','css/style_krisfr.css');
+//define('THEME','css/style_krisfr.css');
+define('STARTTHEME','css/style_krisfr-start.css');
+define('ENDTHEME','css/style_krisfr-end.css');
 
 if (!USE_GOOGLE_THUMBS){ 
 	session_start();
@@ -351,10 +353,10 @@ if (isset($_GET['q'])){
 
 ?>
 <!DOCTYPE html>
-<html dir="ltr" lang="fr">
+<html dir="ltr" lang="<?php echo $langue ?>">
 <head>
 	<title><?php echo $title;?> </title>
-	<meta charset="UTF-8" />
+	<meta charset="utf-8" />
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<meta name="robots" content="all" />
 	<link rel="apple-touch-icon-precomposed" sizes="144x144" href="img/apple-touch-icon-144x144-precomposed.png">
@@ -365,7 +367,9 @@ if (isset($_GET['q'])){
 	<meta name="msapplication-TileImage" content="img/apple-touch-icon-144x144-precomposed.png">
 	<?php if (is_file('img/favicon.png')){echo '<link rel="shortcut icon" href="img/favicon.png" /> ';}?>
 	
-	<link rel="stylesheet" href="<?php echo THEME;?>" />
+	<!--link rel="stylesheet" href="<?php echo THEME;?>" /-->
+	<link rel="stylesheet" href="<?php echo ($q_raw=='')? STARTTHEME:ENDTHEME;?>" />
+	
 	<link rel="stylesheet" href="css/magnific-popup.css" />
 	<link rel="search" type="application/opensearchdescription+xml" title="<?php echo msg('Googol - google without lies'); ?>" href="<?php echo RACINE;?>/googol.xml">
 	<link rel="author" href="humans.txt" />
