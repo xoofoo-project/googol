@@ -36,10 +36,12 @@ header #lang .version{float:left;font-size:14px;}
 form {padding-top: 170px;}
 #formsearch {display: block; margin: 0 auto; text-align: center;}
 input[type=text], #color_selection, #size_selection{font-size:16px;height:30px;width:35%;padding:3px;border:1px solid #ccc;margin-left:10px;margin-top:1px;}
+input[type=text]{min-width:230px;}
 input[type=text]:hover{border-color:#aaa;}
-input[type=submit]{height:30px;width:40px;font-size:14px;background-color:#4a8cf7;border:1px solid #397be6;color:#eee;}
-input[type=submit]:hover{background-color:#397be6;border-color:#286ad5 }
-input[type=submit]:active{background-color:#397be6;border-color:transparent;border-top:2px solid transparent;}
+.add-on {position:absolute;display:inline-block;margin:-3px 25px 0 -30px !important;padding-top:10px;z-index:999; color:#555;}
+button, input[type=submit]{height:30px;width:70px;font-size:14px;background-color:#4a8cf7;border:1px solid #397be6;color:#eee; margin-left: 1em; border-radius: 2px;}
+button:hover, input[type=submit]:hover{background-color:#397be6;border-color:#286ad5 }
+button:active, input[type=submit]:active{background-color:#397be6;border-color:transparent;border-top:2px solid transparent;}
 /** Simple fade transition  */
 .mfp-fade.mfp-bg {opacity: 0;-webkit-transition: all 0.15s ease-out; -moz-transition: all 0.15s ease-out; transition: all 0.15s ease-out;}
 .mfp-fade.mfp-bg.mfp-ready {opacity: 0.8;}
@@ -138,6 +140,7 @@ select {
 	header span.logo {font-size: 56px;}
 	nav li{width:70px;}
 	form {padding-top: 80px;}
+	button{width:40px;}
 	select{width:80% !important;}
 	#size_selection{margin-bottom:15px;}
 }

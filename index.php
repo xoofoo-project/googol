@@ -36,7 +36,7 @@ define('SAFESEARCH_LEVEL',SAFESEARCH_ON);// SAFESEARCH_ON, SAFESEARCH_IMAGESONLY
 define('URL','https://www.google.com/search?hl='.LANGUAGE.SAFESEARCH_LEVEL.'&id=hp&q=');
 define('URLIMG','&tbm=isch&biw=1920&bih=1075');
 define('URLVID','&tbm=vid');
-define('VERSION','v1.5');
+define('VERSION','v1.5c');
 define('USE_GOOGLE_THUMBS',false);
 //define('THEME','css/style_krisfr.css');
 define('STARTTHEME','css/style_krisfr-start.css');
@@ -369,7 +369,10 @@ if (isset($_GET['q'])){
 	
 	<!--link rel="stylesheet" href="<?php echo THEME;?>" /-->
 	<link rel="stylesheet" href="<?php echo ($q_raw=='')? STARTTHEME:ENDTHEME;?>" />
-	
+	<link rel="stylesheet" href="css/fontawesome.css" />
+	<!--[if IE 7]>
+		<link rel="stylesheet" href="css/fontawesome-ie7.css">
+	<![endif]-->
 	<link rel="stylesheet" href="css/magnific-popup.css" />
 	<link rel="search" type="application/opensearchdescription+xml" title="<?php echo msg('Googol - google without lies'); ?>" href="<?php echo RACINE;?>/googol.xml">
 	<link rel="author" href="humans.txt" />
@@ -392,7 +395,7 @@ if (isset($_GET['q'])){
 				<div id="lang">
 					<a class="<?php is_active(LANGUAGE,'fr'); ?>" href="?lang=fr">FR</a> 
 					<a class="<?php is_active(LANGUAGE,'en'); ?>" href="?lang=en">EN</a>  -  
-					<a class="popup-with-zoom-anim" href="#small-dialog" >Infos</a>
+					<a class="popup-with-zoom-anim" href="#small-dialog" ><i class="icon-info-sign"></i></a>
 				</div>
 			</nav>
 		</div>
@@ -409,7 +412,11 @@ if (isset($_GET['q'])){
 		<span class="logo"><?php echo LOGO1.LOGO2; ?></span>
 		<span>
 			<input type="text" name="q" autofocus value="<?php  echo $q_txt; ?>"/>
-			<input type="submit" value="OK"/>
+			<?php if ($mode=='web'){echo '<span class="add-on"><i class="icon-globe"></i></span><input type="hidden" name="web"/>';}?>
+			<?php if ($mode=='images'){echo '<span class="add-on"><i class="icon-camera-retro"></i></span><input type="hidden" name="img"/>';}?>
+			<?php if ($mode=='videos'){echo '<span class="add-on"><i class="icon-film"></i></span><input type="hidden" name="vid"/>';}?>
+			<button><i class="icon-search" alt="OK"></i></button>
+			<!--input type="submit" value="OK"/-->
 		</span>
 		<?php
 			if ($mode!=''){echo '<br><input type="hidden" name="mod" value="'.$mode.'"/>';}
