@@ -12,7 +12,6 @@ a {text-decoration: none; }
 hr{border:none;border-top:1px solid #aaa;}
 h3,.title{font-weight: normal;}
 .title b{font-style: italic !important}
-/*form{margin:0;padding:0;line-height:35px;}*/
 header{text-align:left;width:auto;background-color:#ddd;padding:0;border-bottom:1px solid #ccc;}
 header,footer{
 	background-image: -moz-linear-gradient(top, #eee, #ddd);
@@ -28,17 +27,20 @@ em.g, em.o3,em.o1,em.o2{font-style:normal;}
 header span{white-space :nowrap;margin:0;padding:0; font-style: normal;}
 header span.logo{margin-left:10px;vertical-align:middle;font-family: 'Belleza', sans-serif;font-size:36px; font-style:normal !important; text-shadow: 0 1px 1px #aaa;-webkit-touch-callout: none; -webkit-user-select: none; -khtml-user-select: none; -moz-user-select: none; -ms-user-select: none; user-select: none;}
 header .msg{font-size:12px;color:#444;font-style:italic;text-shadow:0 1px 1px #fff;padding:0 10px;text-align: center;}
-header .top{margin:0;margin-bottom:15px;padding:5px 10px 0 5px;text-align:right;font-weight: bold;color:#aaa;background-color:#2d2d2d;border-bottom:1px solid black;box-shadow: 0 1px 1px black;}
-header .top a:hover{color:#aaa;}
-header .top a{color:#666;}
-header .top a.active{color:white;font-weight: bold;}
-header .top .version{float:left;font-size:14px;}
-#formsearch {display: block; margin: 0 auto; text-align: center;}
-nav{padding-left:5px;background-color:white;border-bottom:1px solid #ccc;margin-bottom:40px; text-align: center;}
-nav li{border-bottom:4px solid transparent;background-color:white; display:inline-block;list-style:none;width:100px;height:25px;font-size:14px;text-align: center;padding-top:4px;}
+header .top{margin:0;margin-bottom:15px;padding-top:5px;font-weight: bold;color:#aaa;background-color:#2d2d2d;box-shadow: 0 1px 1px black;}
+nav #selectsearch { display: inline; margin: 0 auto; width: 25%; }
+nav{ text-align: center;}
+nav li{display:inline-block;list-style:none;width:100px;height:25px;font-size:14px;text-align: center;padding-top:4px;}
 nav li.active{color:red;font-weight: bold;border-bottom:4px solid red;}
-nav li a{color:#666;}
-nav li a:hover{color:#111;}
+nav li a{color:#fff;font-weight:normal;}
+nav li a:hover{color:#888; }
+header #lang {display: inline-block; float: right; padding-top: 2px;}
+header #lang a:hover{color:#aaa;}
+header #lang a{color:#666;}
+header #lang a.active{color:white;font-weight: bold;}
+header #lang .version{float:left;font-size:14px;}
+#chromeframe {margin:0;margin-bottom:15px;padding:5px 10px 0 5px;text-align:center; font-size: 12px; font-weight: bold;color:#fff;}
+#formsearch {display: block; margin: 0 auto; text-align: center;}
 input[type=text], #color_selection, #size_selection{font-size:16px;height:30px;width:50%;border-radius: 3px; padding:3px;border:1px solid #ccc;box-shadow: inset 0 1px 2px #ddd;margin-left:10px;margin-top:1px;}
 input[type=text]:hover{border-color:#aaa;}
 input[type=submit]{height:30px;width:40px;font-size:14px;background-color:#4a8cf7;border:1px solid #397be6;border-radius: 3px;color:#eee; box-shadow:  0 1px 2px #397be6}
@@ -200,15 +202,17 @@ select {
 }
 @media screen and (max-width: 670px){
 	.video{width:100%;}
+	.nomobile{display:none;}
 }
 @media screen and (max-width: 480px){
 	.logo{display:block !important;text-align: center;}
+	.top {font-size: .8em !important;}
 	header span input[type=text]{width:80% !important;margin-bottom:15px;}
+	header #lang {display: none;}
+	nav li{width:70px;}
 	select{width:80% !important;}
 	#size_selection{margin-bottom:15px;}
 	section{width:95%; padding:0 0 15px;}
-	.nomobile{display:none;}
-	nav li{font-size:18px;height:30px;}
 	div.image{width:100%;}
 	div.image img{width:100%;height:auto;}
 }

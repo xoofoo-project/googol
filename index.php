@@ -49,7 +49,7 @@ if (!USE_GOOGLE_THUMBS){
 $lang['fr']=array(
 	'previous'=>my_htmlspecialchars('Page précédente'),
 	'next'=>'Page suivante',
-	'The thumbnails are temporarly stored in this server to hide your ip from Google…'=>my_htmlspecialchars('les miniatures sont temporairement récupérées sur ce serveur, google n\'a pas votre IP…'),
+	'The thumbnails are temporarly stored in this server to hide your ip from Google…'=>my_htmlspecialchars('Les miniatures sont temporairement récupérées sur ce serveur, google n\'a pas votre IP…'),
 	'Search anonymously on Google (direct links, fake referer)'=>my_htmlspecialchars('Rechercher anonymement sur Google (liens directs et referrer caché)'),
 	'Free and open source (please keep a link to warriordudimanche.net for the author ^^)'=>my_htmlspecialchars('Libre et open source, merci de laisser un lien vers warriordudimanche.net pour citer l\'auteur ;)'),
 	'Googol - google without lies'=>'Googol - Google sans mensonge',
@@ -368,14 +368,30 @@ if (isset($_GET['q'])){
 	<link rel="stylesheet" href="<?php echo THEME;?>" />
 	<link rel="stylesheet" href="css/magnific-popup.css" />
 	<link rel="search" type="application/opensearchdescription+xml" title="<?php echo msg('Googol - google without lies'); ?>" href="<?php echo RACINE;?>/googol.xml">
+	<link rel="author" href="humans.txt" />
 	<!--[if IE]><script> document.createElement("article");document.createElement("aside");document.createElement("section");document.createElement("footer");</script> <![endif]-->
 </head>
 <body class="<?php echo $mode;?>">
+<a class="nomobile" href="https://github.com/xoofoo-project/googol" title="<?php echo msg('Project on Github');?>"><img style="position: absolute; top: 0; left: 0; border: 0;" src="img/forkme_left_orange_ff7600.png" alt="Fork me on GitHub"></a>
 <header>
 	<div class="top">
-		<a class="<?php is_active(LANGUAGE,'fr'); ?>" href="?lang=fr">FR</a> 
-		<a class="<?php is_active(LANGUAGE,'en'); ?>" href="?lang=en">EN</a>  -  
-		<a class="popup-with-zoom-anim" href="#small-dialog" >Infos</a>
+		<!--[if lt IE 9]>
+			<div id="chromeframe"><p>Votre navigateur internet n'est plus à jour. <a href="http://browsehappy.com/" title="Mettez à jour votre navigateur" rel="external">Mettez à jour votre navigateur aujourd'hui</a> ou <a href="http://www.google.com/chromeframe/?redirect=true" title="install Google Chrome Frame" rel="external">installez le plugin Google Chrome Frame</a> pour une meilleur navigation sur ce site.</p></div>
+		<![endif]-->
+		<div id="menu">
+			<nav id="selectsearch">
+			<?php 
+				if ($mode=='web'){echo '<li class="active">Web</li><li><a href="?q='.urlencode($q_raw).'&mod=images&lang='.$langue.'">Images</a></li><li><a href="?q='.urlencode($q_raw).'&mod=videos&lang='.$langue.'">'.msg('Videos').'</a></li>';}
+				else if($mode=='images'){echo '<li><a href="?q='.urlencode($q_raw).'&lang='.$langue.'">Web</a></li><li class="active">Images</li><li><a href="?q='.urlencode($q_raw).'&mod=videos&lang='.$langue.'">'.msg('Videos').'</a></li>';}
+				else { echo '<li><a href="?q='.urlencode($q_raw).'&lang='.$langue.'">Web</a></li><li><a href="?q='.urlencode($q_raw).'&mod=images&lang='.$langue.'">Images</a></li><li class="active">'.msg('Videos').'</li>';}
+			?>
+				<div id="lang">
+					<a class="<?php is_active(LANGUAGE,'fr'); ?>" href="?lang=fr">FR</a> 
+					<a class="<?php is_active(LANGUAGE,'en'); ?>" href="?lang=en">EN</a>  -  
+					<a class="popup-with-zoom-anim" href="#small-dialog" >Infos</a>
+				</div>
+			</nav>
+		</div>
 		<div id="small-dialog" class="zoom-anim-dialog mfp-hide">
 			<h1 class="version"><?php echo LOGO1.LOGO2; ?> <?php echo my_htmlspecialchars(VERSION); ?></h1>
 			<p><a class="wot-exclude" href="#" title="<?php echo msg('Free and open source (please keep a link to warriordudimanche.net for the author ^^)');?>">Licence</a></p>
@@ -388,7 +404,7 @@ if (isset($_GET['q'])){
 		<input type="hidden" name="lang" value="<?php echo LANGUAGE;?>"/>
 		<span class="logo"><?php echo LOGO1.LOGO2; ?></span>
 		<span>
-			<input type="text" name="q" placeholder="<?php echo msg('Search'); ?>" value="<?php  echo $q_txt; ?>"/>
+			<input type="text" name="q" autofocus placeholder="<?php echo msg('Search'); ?>" value="<?php  echo $q_txt; ?>"/>
 			<input type="submit" value="OK"/>
 		</span>
 		<?php
@@ -452,17 +468,10 @@ if (isset($_GET['q'])){
 	<p class="msg nomobile">
 		<?php 
 			echo msg('Search anonymously on Google (direct links, fake referer)'); 
-			if ($mode!='web'){	echo '<br/>'.msg('The thumbnails are temporarly stored in this server to hide your ip from Google…');	} 
+			if ($mode!='web'){	echo '<br>'.msg('The thumbnails are temporarly stored in this server to hide your ip from Google…');	} 
 		?> 
 	</p>
 </header>
-<nav>
-<?php 
-	if ($mode=='web'){echo '<li class="active">Web</li><li><a href="?q='.urlencode($q_raw).'&mod=images&lang='.$langue.'">Images</a></li><li><a href="?q='.urlencode($q_raw).'&mod=videos&lang='.$langue.'">'.msg('Videos').'</a></li>';}
-	else if($mode=='images'){echo '<li><a href="?q='.urlencode($q_raw).'&lang='.$langue.'">Web</a></li><li class="active">Images</li><li><a href="?q='.urlencode($q_raw).'&mod=videos&lang='.$langue.'">'.msg('Videos').'</a></li>';}
-	else { echo '<li><a href="?q='.urlencode($q_raw).'&lang='.$langue.'">Web</a></li><li><a href="?q='.urlencode($q_raw).'&mod=images&lang='.$langue.'">Images</a></li><li class="active">'.msg('Videos').'</li>';}
-?>	
-</nav>
 <section>
 	<?php if ($q_raw!=''){render_query(parse_query($q_raw,$start,$mode));} ?>
 </section>
