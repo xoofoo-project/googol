@@ -44,7 +44,7 @@ header #lang .version{float:left;font-size:14px;}
 input[type=text], #color_selection, #size_selection{font-size:16px;height:30px;width:50%;padding:3px;border:1px solid #ccc;margin-left:10px;margin-top:1px;}
 input[type=text]{min-width:230px;}
 input[type=text]:hover{border-color:#aaa;}
-.add-on {position:absolute;display:inline-block;margin:0 25px 0 -30px !important;padding-top:10px;z-index:999; color:#555;}
+.add-on {position:relative;display:inline-block;margin:0 25px 0 -30px !important;padding-top:10px;z-index:999; color:#555;}
 button, input[type=submit]{height:30px;width:70px;font-size:14px;background-color:#4a8cf7;border:1px solid #397be6;color:#eee; margin-left: 1em; border-radius: 2px;}
 button:hover, input[type=submit]:hover{background-color:#397be6;border-color:#286ad5 }
 button:active, input[type=submit]:active{background-color:#397be6;border-color:transparent;border-top:2px solid transparent;}
