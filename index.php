@@ -383,7 +383,7 @@ if (isset($_GET['q'])){
 <header>
 	<div class="top">
 		<!--[if lt IE 9]>
-			<div id="chromeframe"><p>Votre navigateur internet n'est plus à jour. <a href="http://browsehappy.com/" title="Mettez à jour votre navigateur" rel="external">Mettez à jour votre navigateur aujourd'hui</a> ou <a href="http://www.google.com/chromeframe/?redirect=true" title="install Google Chrome Frame" rel="external">installez le plugin Google Chrome Frame</a> pour une meilleur navigation sur ce site.</p></div>
+			<div id="chromeframe"><p>Votre navigateur internet n'est plus à jour. <a class="wot-exclude" href="http://browsehappy.com/" title="Mettez à jour votre navigateur" rel="external">Mettez à jour votre navigateur aujourd'hui</a> ou <a href="http://www.google.com/chromeframe/?redirect=true" title="install Google Chrome Frame" rel="external">installez le plugin Google Chrome Frame</a> pour une meilleur navigation sur ce site.</p></div>
 		<![endif]-->
 		<div id="menu">
 			<nav id="selectsearch">
