@@ -15,7 +15,7 @@ define('LANGUAGE',$langue);
 define('RACINE','http://'.$_SERVER['HTTP_HOST'] );
 define('USE_WEB_OF_TRUST',true);
 define('WOT_URL','http://www.mywot.com/scorecard/');
-define('REGEX_WEB','#(?<=<h3 class="r"><a href="/url\?q=)([^&]+).*?>(.*?)</a>.*?(?<=<span class="st">)(.*?)(?=</span>)#');
+define('REGEX_WEB','#(?<=<h3 class="r"><a href="/url\?q=)([^&]+).*?>(.*?)</a>.*?(?<=<span class="st">)(.*?)(?=</span>)#s');
 define('REGEX_PAGES','#&start=([0-9]+)|&start=([0-9]+)#');
 define('REGEX_IMG','#(?<=imgurl=)(.*?)&imgrefurl=(.*?)&.*?h=([0-9]+)&w=([0-9]+)&sz=([0-9]+)|(?<=imgurl=)(.*?)&imgrefurl=(.*?)&.*?h=([0-9]+)&w=([0-9]+)&sz=([0-9]+)#');
 define('REGEX_THMBS','#<img.*?height="([0-9]+)".*?width="([0-9]+)".*?src="([^"]+)"#');
