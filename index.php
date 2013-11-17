@@ -17,8 +17,8 @@ define('USE_WEB_OF_TRUST',true);
 define('WOT_URL','http://www.mywot.com/scorecard/');
 define('REGEX_WEB','#(?<=<h3 class="r"><a href="/url\?q=)([^&]+).*?>(.*?)</a>.*?(?<=<span class="st">)(.*?)(?=</span>)#s');
 define('REGEX_PAGES','#&start=([0-9]+)|&start=([0-9]+)#');
-define('REGEX_IMG','#(?<=imgurl=)(.*?)&imgrefurl=(.*?)&.*?h=([0-9]+)&w=([0-9]+)&sz=([0-9]+)|(?<=imgurl=)(.*?)&imgrefurl=(.*?)&.*?h=([0-9]+)&w=([0-9]+)&sz=([0-9]+)#');
-define('REGEX_THMBS','#<img.*?height="([0-9]+)".*?width="([0-9]+)".*?src="([^"]+)"#');
+define('REGEX_IMG','#(?<=imgurl=)(.*?)&imgrefurl=(.*?)&.*?h=([0-9]+)&w=([0-9]+)&sz=([0-9]+)|(?<=imgurl=)(.*?)&imgrefurl=(.*?)&.*?h=([0-9]+)&w=([0-9]+)&sz=([0-9]+)#s');
+define('REGEX_THMBS','#<img.*?height="([0-9]+)".*?src="([^"]+)".*?width="([0-9]+)"#s');
 
 define('REGEX_VID','#(?:<img.*?src="([^"]+)".*?width="([0-9]+)".*?)?<h3 class="r">[^<]*<a href="/url\?q=(.*?)(?:&|&).*?">(.*?)</a>.*?<cite[^>]*>(.*?)</cite>.*?<span class="(?:st|f)">(.*?)(?:</span></td>|</span><br></?div>)#');
 define('REGEX_VID_THMBS','#<img.*?src="([^"]+)".*?width="([0-9]+)"#');
@@ -27,7 +27,7 @@ define('TPLIMG','<div class="image zoom-gallery" ><p><a class="" rel="noreferrer
 define('TPLVID','<div class="video"><h3><a class="popup-youtube" rel="noreferrer" href="#link" title="#link">#titre</a></h3><a class="thumb popup-youtube" rel="noreferrer" href="#link" title="#link">#thumbs</a><p class="site">#site</p><p class="description">#description</p></div>');
 define('LOGO1','<a href="'.RACINE.'"><em class="g">G</em><em class="o1">o</em>');
 define('LOGO2','<em class="o2">o</em><em class="g">g</em><em class="o1">o</em><em class="o3">l</em></a>');
-
+define('CAPCHA_DETECT','<form action="Captcha" method="get"><input type="hidden" name="continue"');
 define('SAFESEARCH_ON','&safe=on');
 define('SAFESEARCH_IMAGESONLY','&safe=images');
 define('SAFESEARCH_OFF','&safe=off');
@@ -51,6 +51,7 @@ if (!USE_GOOGLE_THUMBS){
 $lang['fr']=array(
 	'previous'=>my_htmlspecialchars('Page précédente'),
 	'next'=>'Page suivante',
+	'Google has received too mutch requests from this IP, try again later or with another version af googol.'=>my_htmlspecialchars('Google a reçu trop de requêtes de cette IP et la bloque: essaie plus tard !'),
 	'The thumbnails are temporarly stored in this server to hide your ip from Google…'=>my_htmlspecialchars('Les miniatures sont temporairement récupérées sur ce serveur, google n\'a pas votre IP…'),
 	'Search anonymously on Google (direct links, fake referer)'=>my_htmlspecialchars('Rechercher anonymement sur Google (liens directs et referrer caché)'),
 	'Free and open source (please keep a link to warriordudimanche.net for the author ^^)'=>my_htmlspecialchars('Libre et open source, merci de laisser un lien vers warriordudimanche.net pour citer l\'auteur ;)'),
@@ -161,11 +162,14 @@ function add_search_engine(){
 		</OpenSearchDescription>');
 	}
 }
+
 function parse_query($query,$start=0){
 	global $mode,$filtre;
 	if ($mode=='web'){ 
 		$page=file_curl_contents(URL.str_replace(' ','+',urlencode($query)).'&start='.$start.'&num=100');
-		# var_dump(my_htmlspecialchars($page));
+		if (stripos($page,CAPCHA_DETECT)!==false){
+			exit(msg('Google has received too mutch requests from this IP, try again later or with another version af googol.'));
+		}
 		if (!$page){return false;}
 		preg_match_all(REGEX_WEB, $page, $r);
 		preg_match_all(REGEX_PAGES,$page,$p);
@@ -173,7 +177,7 @@ function parse_query($query,$start=0){
 
 		$retour=array(
 			'links'=>$r[1],
-			'titles'=>$r[2],
+			'titles'=>array_map('strip_tags',$r[2]),
 			'descriptions'=>array_map('strip_tags',$r[3]),
 			'nb_pages'=>$p,
 			'current_page'=>$start,
@@ -183,7 +187,7 @@ function parse_query($query,$start=0){
 		return $retour;
 	}elseif ($mode=='images'){ 
 		if (!empty($filtre)){$f='&tbs='.$filtre;}else{$f='';}
-		$page=file_curl_contents(URL.str_replace(' ','+',urlencode($query)).URLIMG.$f.'&start='.$start);			
+		$page=file_curl_contents(URL.str_replace(' ','+',urlencode($query)).URLIMG.$f.'&start='.$start);
 		if (!$page){return false;}
 		preg_match_all(REGEX_IMG,$page,$r);
 		preg_match_all(REGEX_PAGES,$page,$p);
@@ -195,8 +199,8 @@ function parse_query($query,$start=0){
 			'h'=>$r[3],
 			'w'=>$r[4],
 			'sz'=>$r[5],
-			'thumbs'=>$t[3],
-			'thumbs_w'=>$t[2],
+			'thumbs'=>$t[2],
+			'thumbs_w'=>$t[3],
 			'thumbs_h'=>$t[1],
 			'nb_pages'=>$p,
 			'current_page'=>$start,
