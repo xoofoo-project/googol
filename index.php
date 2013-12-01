@@ -36,7 +36,7 @@ define('SAFESEARCH_LEVEL',SAFESEARCH_ON);// SAFESEARCH_ON, SAFESEARCH_IMAGESONLY
 define('URL','https://www.google.com/search?hl='.LANGUAGE.SAFESEARCH_LEVEL.'&id=hp&q=');
 define('URLIMG','&tbm=isch&biw=1920&bih=1075');
 define('URLVID','&tbm=vid');
-define('VERSION','v1.5d');
+define('VERSION','v1.5e');
 define('USE_GOOGLE_THUMBS',false);
 //define('THEME','css/style_krisfr.css');
 define('STARTTHEME','css/style_krisfr-start.css');
